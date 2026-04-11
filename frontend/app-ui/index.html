@@ -5,9 +5,56 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>app-ui</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              background: "#f7fafc",
+              surface: "#f7fafc",
+              "surface-dim": "#d2dbe0",
+              "surface-bright": "#f7fafc",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#eff4f7",
+              "surface-container": "#e8eff2",
+              "surface-container-high": "#e2e9ed",
+              "surface-container-highest": "#dbe4e9",
+              "on-surface": "#2b3437",
+              "on-surface-variant": "#576065",
+              primary: "#026880",
+              "on-primary": "#f1faff",
+              "primary-container": "#94dffb",
+              "on-primary-container": "#005063",
+              "primary-dim": "#005b70",
+              "primary-fixed": "#94dffb",
+              secondary: "#4c6367",
+              "secondary-container": "#cee7ec",
+              "on-secondary-container": "#3f5659",
+              "tertiary-container": "#b8cdf7",
+              outline: "#737c80",
+              "outline-variant": "#aab3b8",
+            },
+            fontFamily: {
+              headline: ["Be Vietnam Pro"],
+              body: ["Inter"],
+            },
+          },
+        },
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </body>
 </html>
