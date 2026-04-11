@@ -1,13 +1,191 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>app-ui</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined"
+    rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Tailwind config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#026880",
+            "primary-dim": "#005b70",
+            background: "#f7fafc",
+            surface: "#f7fafc",
+          },
+          fontFamily: {
+            headline: ["Be Vietnam Pro"],
+            body: ["Inter"],
+          }
+        }
+      }
+    }
+  </script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary": "#f8f8ff",
+            "surface-container-low": "#eff4f7",
+            "on-primary-container": "#005063",
+            "outline": "#737c80",
+            "surface-container-high": "#e2e9ed",
+            "surface-dim": "#d2dbe0",
+            "on-tertiary-container": "#304467",
+            "inverse-on-surface": "#9a9da0",
+            "secondary-fixed": "#cee7ec",
+            "error-dim": "#67040d",
+            "tertiary-dim": "#3f5377",
+            "background": "#f7fafc",
+            "primary-fixed": "#94dffb",
+            "surface-container": "#e8eff2",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#94dffb",
+            "primary": "#026880",
+            "on-secondary-fixed": "#2c4347",
+            "on-primary-fixed": "#003c4b",
+            "error-container": "#fa746f",
+            "on-tertiary-fixed-variant": "#394d71",
+            "tertiary-fixed-dim": "#aabfe8",
+            "secondary-fixed-dim": "#c0d9dd",
+            "inverse-primary": "#94dffb",
+            "secondary": "#4c6367",
+            "error": "#a83836",
+            "primary-dim": "#005b70",
+            "on-primary-fixed-variant": "#005a70",
+            "surface-container-highest": "#dbe4e9",
+            "on-error-container": "#6e0a12",
+            "on-secondary": "#ebfcff",
+            "on-surface": "#2b3437",
+            "tertiary": "#4b5f84",
+            "on-error": "#fff7f6",
+            "surface-bright": "#f7fafc",
+            "secondary-dim": "#40575b",
+            "on-primary": "#f1faff",
+            "surface-tint": "#026880",
+            "on-secondary-fixed-variant": "#485f63",
+            "outline-variant": "#aab3b8",
+            "on-tertiary-fixed": "#1b3052",
+            "surface-variant": "#dbe4e9",
+            "on-surface-variant": "#576065",
+            "tertiary-container": "#b8cdf7",
+            "surface": "#f7fafc",
+            "on-background": "#2b3437",
+            "on-secondary-container": "#3f5659",
+            "primary-fixed-dim": "#86d1ec",
+            "tertiary-fixed": "#b8cdf7",
+            "secondary-container": "#cee7ec",
+            "inverse-surface": "#0b0f11"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary": "#f8f8ff",
+            "surface-container-low": "#eff4f7",
+            "on-primary-container": "#005063",
+            "outline": "#737c80",
+            "surface-container-high": "#e2e9ed",
+            "surface-dim": "#d2dbe0",
+            "on-tertiary-container": "#304467",
+            "inverse-on-surface": "#9a9da0",
+            "secondary-fixed": "#cee7ec",
+            "error-dim": "#67040d",
+            "tertiary-dim": "#3f5377",
+            "background": "#f7fafc",
+            "primary-fixed": "#94dffb",
+            "surface-container": "#e8eff2",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#94dffb",
+            "primary": "#026880",
+            "on-secondary-fixed": "#2c4347",
+            "on-primary-fixed": "#003c4b",
+            "error-container": "#fa746f",
+            "on-tertiary-fixed-variant": "#394d71",
+            "tertiary-fixed-dim": "#aabfe8",
+            "secondary-fixed-dim": "#c0d9dd",
+            "inverse-primary": "#94dffb",
+            "secondary": "#4c6367",
+            "error": "#a83836",
+            "primary-dim": "#005b70",
+            "on-primary-fixed-variant": "#005a70",
+            "surface-container-highest": "#dbe4e9",
+            "on-error-container": "#6e0a12",
+            "on-secondary": "#ebfcff",
+            "on-surface": "#2b3437",
+            "tertiary": "#4b5f84",
+            "on-error": "#fff7f6",
+            "surface-bright": "#f7fafc",
+            "secondary-dim": "#40575b",
+            "on-primary": "#f1faff",
+            "surface-tint": "#026880",
+            "on-secondary-fixed-variant": "#485f63",
+            "outline-variant": "#aab3b8",
+            "on-tertiary-fixed": "#1b3052",
+            "surface-variant": "#dbe4e9",
+            "on-surface-variant": "#576065",
+            "tertiary-container": "#b8cdf7",
+            "surface": "#f7fafc",
+            "on-background": "#2b3437",
+            "on-secondary-container": "#3f5659",
+            "primary-fixed-dim": "#86d1ec",
+            "tertiary-fixed": "#b8cdf7",
+            "secondary-container": "#cee7ec",
+            "inverse-surface": "#0b0f11"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          }
+        }
+      }
+    }
+  </script>
+  <title>app-ui</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

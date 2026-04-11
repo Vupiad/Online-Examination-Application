@@ -1,0 +1,31 @@
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+
+        /* Utility for toggle functionality in static HTML */
+        .essay-mode-on .multiple-choice-grid {
+            display: none;
+        }
+
+        .essay-mode-on .essay-textarea-container {
+            display: block;
+        }
+
+        .essay-mode-off .multiple-choice-grid {
+            display: grid;
+        }
+
+        .essay-mode-off .essay-textarea-container {
+            display: none;
+        }
