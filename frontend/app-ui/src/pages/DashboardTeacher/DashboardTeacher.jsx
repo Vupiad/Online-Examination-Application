@@ -1,5 +1,7 @@
 import "./DashboardTeacher.css";
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen flex">
             {/* <!-- SideNavBar Component --> */}
@@ -42,7 +44,8 @@ function Dashboard() {
                 </nav>
                 <div class="mt-auto pt-4 border-t border-outline-variant/20">
                     <button
-                        class="w-full bg-primary text-on-primary py-3 rounded-full font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-primary-dim transition-colors shadow-sm">
+                        class="w-full bg-primary text-on-primary py-3 rounded-full font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-primary-dim transition-colors shadow-sm"
+                        onClick={() => navigate("/test-builder")}>
                         <span class="material-symbols-outlined text-lg" data-icon="add">add</span>
                         <span class="text-sm">Create new test</span>
                     </button>

@@ -8,6 +8,7 @@ import Landing from './pages/LandingPage/Landing.jsx'
 import Login from './pages/Login/Login.jsx'
 import TestBuilder from './pages/TestBuilder/TestBuilder.jsx'
 import DashboardTeacher from './pages/DashboardTeacher/DashboardTeacher.jsx'
+import DashboardStudent from './pages/DashboardStudent/DashboardStudent.jsx'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/test-builder" element={<TestBuilder />} />
           <Route path="/dashboard-teacher" element={<DashboardTeacher />} />
+          <Route path="/dashboard-student" element={<DashboardStudent />} />
 
         </Routes>
       </BrowserRouter>
