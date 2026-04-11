@@ -1,5 +1,5 @@
 package hcmut.online_examination.entity;
-
+import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -26,10 +26,16 @@ public class Test {
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
     @Column(name = "duration_minutes")
     private Integer durationMinutes;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User teacher;
+
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Question> questions;
 }

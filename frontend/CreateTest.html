@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#f8f8ff",
+                        "surface-container-low": "#eff4f7",
+                        "on-primary-container": "#005063",
+                        "outline": "#737c80",
+                        "surface-container-high": "#e2e9ed",
+                        "surface-dim": "#d2dbe0",
+                        "on-tertiary-container": "#304467",
+                        "inverse-on-surface": "#9a9da0",
+                        "secondary-fixed": "#cee7ec",
+                        "error-dim": "#67040d",
+                        "tertiary-dim": "#3f5377",
+                        "background": "#f7fafc",
+                        "primary-fixed": "#94dffb",
+                        "surface-container": "#e8eff2",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#94dffb",
+                        "primary": "#026880",
+                        "on-secondary-fixed": "#2c4347",
+                        "on-primary-fixed": "#003c4b",
+                        "error-container": "#fa746f",
+                        "on-tertiary-fixed-variant": "#394d71",
+                        "tertiary-fixed-dim": "#aabfe8",
+                        "secondary-fixed-dim": "#c0d9dd",
+                        "inverse-primary": "#94dffb",
+                        "secondary": "#4c6367",
+                        "error": "#a83836",
+                        "primary-dim": "#005b70",
+                        "on-primary-fixed-variant": "#005a70",
+                        "surface-container-highest": "#dbe4e9",
+                        "on-error-container": "#6e0a12",
+                        "on-secondary": "#ebfcff",
+                        "on-surface": "#2b3437",
+                        "tertiary": "#4b5f84",
+                        "on-error": "#fff7f6",
+                        "surface-bright": "#f7fafc",
+                        "secondary-dim": "#40575b",
+                        "on-primary": "#f1faff",
+                        "surface-tint": "#026880",
+                        "on-secondary-fixed-variant": "#485f63",
+                        "outline-variant": "#aab3b8",
+                        "on-tertiary-fixed": "#1b3052",
+                        "surface-variant": "#dbe4e9",
+                        "on-surface-variant": "#576065",
+                        "tertiary-container": "#b8cdf7",
+                        "surface": "#f7fafc",
+                        "on-background": "#2b3437",
+                        "on-secondary-container": "#3f5659",
+                        "primary-fixed-dim": "#86d1ec",
+                        "tertiary-fixed": "#b8cdf7",
+                        "secondary-container": "#cee7ec",
+                        "inverse-surface": "#0b0f11"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Be Vietnam Pro"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Be Vietnam Pro', sans-serif; }
+        
+        /* Utility for toggle functionality in static HTML */
+        .essay-mode-on .multiple-choice-grid { display: none; }
+        .essay-mode-on .essay-textarea-container { display: block; }
+        .essay-mode-off .multiple-choice-grid { display: grid; }
+        .essay-mode-off .essay-textarea-container { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col p-4 gap-2 h-screen w-64 docked left-0 bg-[#e8eff2] dark:bg-slate-900 sticky top-0">
+<div class="mb-8 px-2">
+<h1 class="font-['Be_Vietnam_Pro'] font-bold text-[#026880] text-xl">The Serene Scholar</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline mt-1 font-semibold">Teacher Portal</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-4 mb-6 bg-surface-container-lowest rounded-xl">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container">
+<img alt="Teacher Avatar" data-alt="Portrait of a professional teacher in a library setting, soft natural lighting, editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMOqqoyaGz2Uq8bvWZMDV3-nBd_fcOK6BZEotIyZYHzwFvjRQow9LUVauXlXqtH-cF6WJpV6_vVX47BuW5u2SJ40A_a4Nirbg_BhfsM2RP0xCRFxCJw62b-htj2Qz7wSTrgC5dtgRbS4TJnDSvZ_v3b8ewVEtwBHzhh5DbiDXaZgxx9KVLiTTrH4qIfHno-qum_VEHiXd872dewR1vyTREdjGSPO5eFdniktl1l7vIuVkJwG893eh8v1GVxnrHzsECBB7vPSfFcEc1"/>
+</div>
+<div>
+<p class="font-headline font-bold text-sm text-primary">Welcome, Teacher</p>
+<p class="text-xs text-secondary-dim">Exam Management System</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#3f5659] hover:bg-[#dbe4e9] transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#3f5659] hover:bg-[#dbe4e9] transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-medium">Class List</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#3f5659] hover:bg-[#dbe4e9] transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<button class="mt-4 w-full bg-primary text-on-primary py-3 rounded-xl font-headline font-semibold flex items-center justify-center gap-2 shadow-sm hover:bg-primary-dim transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span>Create new test</span>
+</button>
+<div class="mt-auto pt-4 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/10 transition-all duration-300 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-medium">Log out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 min-w-0 flex flex-col relative">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-8 h-16 w-full bg-[#f7fafc] dark:bg-slate-900 border-b border-surface-container-high sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold text-[#026880] font-headline">Test Builder</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center gap-6">
+<a class="text-[#2b3437] hover:text-[#005b70] transition-colors font-medium" href="#">Exams</a>
+<a class="text-[#2b3437] hover:text-[#005b70] transition-colors font-medium" href="#">Results</a>
+<a class="text-[#2b3437] hover:text-[#005b70] transition-colors font-medium" href="#">Schedule</a>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</button>
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Builder Content -->
+<div class="flex-1 overflow-y-auto px-6 py-8 md:px-12 lg:px-24">
+<!-- Settings Card -->
+<section class="max-w-4xl mx-auto mb-12">
+<div class="bg-surface-container-lowest rounded-full p-8 shadow-sm">
+<h3 class="text-lg font-headline font-bold text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="tune">tune</span>
+                        Test Setup
+                    </h3>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<div class="md:col-span-5 space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider ml-1">Test Name</label>
+<input class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="e.g.: Final Exam - Mathematics" type="text"/>
+</div>
+<div class="md:col-span-2 space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider ml-1">Duration (mins)</label>
+<input class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="60" type="number"/>
+</div>
+<div class="md:col-span-5 space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider ml-1">Test Deadline</label>
+<div class="grid grid-cols-2 gap-2">
+<input class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-xs" type="datetime-local"/>
+<input class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-xs" type="datetime-local"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Question Builder -->
+<section class="max-w-4xl mx-auto space-y-8 pb-32">
+<!-- Question Block 1 (Multiple Choice State) -->
+<div class="bg-surface-container-lowest rounded-full shadow-sm relative overflow-hidden group essay-mode-off">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="p-8 md:p-12">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-6">
+<span class="text-3xl font-headline font-light text-primary-dim opacity-40">01</span>
+<!-- Toggle Switch -->
+<div class="flex items-center gap-3 bg-surface-container-high rounded-full px-3 py-1.5 border border-outline-variant/20">
+<span class="text-xs font-bold text-outline uppercase tracking-wider">Essay Question</span>
+<button class="w-10 h-5 bg-outline-variant/30 rounded-full relative transition-colors duration-200 focus:outline-none" onclick="this.closest('.group').classList.toggle('essay-mode-on'); this.closest('.group').classList.toggle('essay-mode-off'); this.querySelector('div').classList.toggle('translate-x-5'); this.classList.toggle('bg-primary/40');">
+<div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+</button>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-outline hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+<button class="p-2 text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="content_copy">content_copy</span></button>
+</div>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider">Question Content</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all resize-none font-body leading-relaxed" placeholder="Enter question here..." rows="3"></textarea>
+</div>
+<!-- Multiple Choice Container -->
+<div class="multiple-choice-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md hover:bg-surface-container-high transition-colors">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-highest" name="q1_correct" type="radio"/>
+<div class="flex-1">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface" placeholder="Option A" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md hover:bg-surface-container-high transition-colors">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-highest" name="q1_correct" type="radio"/>
+<div class="flex-1">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface" placeholder="Option B" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md hover:bg-surface-container-high transition-colors">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-highest" name="q1_correct" type="radio"/>
+<div class="flex-1">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface" placeholder="Option C" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md hover:bg-surface-container-high transition-colors">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-highest" name="q1_correct" type="radio"/>
+<div class="flex-1">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface" placeholder="Option D" type="text"/>
+</div>
+</div>
+</div>
+<!-- Essay Response Container -->
+<div class="essay-textarea-container mt-6 hidden">
+<label class="text-xs font-bold text-outline uppercase tracking-wider mb-2 block">Essay Response Suggestion</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md px-6 py-5 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all resize-none font-body leading-relaxed italic text-on-surface/70" placeholder="Enter suggestion or sample answer for essay question..." rows="6"></textarea>
+</div>
+</div>
+</div>
+</div>
+<!-- Question Block 2 (Template) -->
+<div class="bg-surface-container-lowest rounded-full shadow-sm relative overflow-hidden group essay-mode-off">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline-variant opacity-30"></div>
+<div class="p-8 md:p-12">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-6">
+<span class="text-3xl font-headline font-light text-primary-dim opacity-40">02</span>
+<!-- Toggle Switch -->
+<div class="flex items-center gap-3 bg-surface-container-high rounded-full px-3 py-1.5 border border-outline-variant/20">
+<span class="text-xs font-bold text-outline uppercase tracking-wider">Essay Question</span>
+<button class="w-10 h-5 bg-outline-variant/30 rounded-full relative transition-colors duration-200 focus:outline-none" onclick="this.closest('.group').classList.toggle('essay-mode-on'); this.closest('.group').classList.toggle('essay-mode-off'); this.querySelector('div').classList.toggle('translate-x-5'); this.classList.toggle('bg-primary/40');">
+<div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+</button>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-outline hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+<button class="p-2 text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="content_copy">content_copy</span></button>
+</div>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider">Question Content</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all resize-none" placeholder="Enter next question..." rows="3"></textarea>
+</div>
+<!-- Multiple Choice Container -->
+<div class="multiple-choice-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container-highest" name="q2_correct" type="radio"/>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0" placeholder="Option A" type="text"/>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container-highest" name="q2_correct" type="radio"/>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0" placeholder="Option B" type="text"/>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container-highest" name="q2_correct" type="radio"/>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0" placeholder="Option C" type="text"/>
+</div>
+<div class="flex items-center gap-3 p-4 bg-surface-container rounded-md">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container-highest" name="q2_correct" type="radio"/>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0" placeholder="Option D" type="text"/>
+</div>
+</div>
+<!-- Essay Response Container -->
+<div class="essay-textarea-container mt-6 hidden">
+<label class="text-xs font-bold text-outline uppercase tracking-wider mb-2 block">Essay Response Suggestion</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md px-6 py-5 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all resize-none font-body leading-relaxed italic text-on-surface/70" placeholder="Enter suggestion or sample answer for essay question..." rows="6"></textarea>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Question Placeholder -->
+<button class="w-full py-12 border-2 border-dashed border-outline-variant/30 rounded-full flex flex-col items-center justify-center gap-4 text-outline hover:border-primary/50 hover:text-primary transition-all group">
+<span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform" data-icon="add_circle">add_circle</span>
+<span class="font-headline font-semibold">Add new question</span>
+</button>
+</section>
+</div>
+<!-- Sticky Footer Action -->
+<footer class="sticky bottom-0 left-0 right-0 p-6 bg-surface-container-lowest/80 backdrop-blur-xl border-t border-surface-container-high flex justify-center items-center z-40">
+<div class="max-w-4xl w-full flex justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-secondary uppercase tracking-widest">
+                        2 Questions
+                    </div>
+<p class="text-xs text-outline italic">Auto-saved to drafts at 10:24 AM</p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 bg-secondary-container text-on-secondary-container rounded-full font-headline font-semibold hover:opacity-90 transition-opacity">
+                        Preview
+                    </button>
+<button class="px-10 py-3 bg-primary text-on-primary rounded-full font-headline font-bold shadow-lg shadow-primary/20 flex items-center gap-2 hover:bg-primary-dim transition-all">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+                        Save test
+                    </button>
+</div>
+</div>
+</footer>
+</main>
+<!-- Floating Navigation Rail -->
+<div class="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4 bg-surface-container-lowest/80 backdrop-blur-md p-3 rounded-full shadow-xl shadow-on-surface/5 border border-white/20 hidden xl:flex">
+<button class="p-3 bg-primary text-on-primary rounded-full shadow-md"><span class="material-symbols-outlined" data-icon="settings">settings</span></button>
+<button class="p-3 text-secondary hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined" data-icon="image">image</span></button>
+<button class="p-3 text-secondary hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined" data-icon="functions">functions</span></button>
+<div class="w-full h-px bg-outline-variant/20"></div>
+<button class="p-3 text-secondary hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined" data-icon="help">help</span></button>
+</div>
+</body></html>

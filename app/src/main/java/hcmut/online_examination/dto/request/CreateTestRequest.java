@@ -1,5 +1,6 @@
 package hcmut.online_examination.dto.request;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,14 +9,13 @@ public record CreateTestRequest(
     Integer durationMinutes,
     LocalDateTime startTime,
     LocalDateTime endTime,
-    String status,
+    String passcode,
     List<QuestionDto> questions
 ) {
+
     public record QuestionDto(
-        Integer orderIndex,
-        String questionType,
         String content,
-        String essaySuggestion,
+        BigDecimal points,
         List<OptionDto> options
     ) {}
 
@@ -24,4 +24,3 @@ public record CreateTestRequest(
         Boolean isCorrect
     ) {}
 }
-
