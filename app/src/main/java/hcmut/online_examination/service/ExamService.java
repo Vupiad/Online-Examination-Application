@@ -51,7 +51,7 @@ public class ExamService {
 
     @Transactional
     public ExamEntity createExam(
-            Long ownerId, // Đã đổi thành Long
+            Long ownerId, 
             String examCode,
             String title,
             Long duration,
@@ -60,7 +60,6 @@ public class ExamService {
             Instant startTime,
             Instant endTime
     ) {
-        // Truyền thẳng ownerId
         User user = userRepository.findById(ownerId)
                 .orElseThrow(UserNotFoundException::new);
 

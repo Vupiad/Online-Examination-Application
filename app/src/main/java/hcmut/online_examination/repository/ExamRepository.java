@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ExamRepository extends JpaRepository<ExamEntity, UUID> {
+public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
 
     Optional<ExamEntity> findByPasscodeAndId(String passcode, UUID id);
 
