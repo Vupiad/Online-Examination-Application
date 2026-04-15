@@ -20,7 +20,14 @@ const Login = () => {
     try {
       const response = await authService.login({ username, password });
       console.log('Login success:', response);
-      navigate('/'); 
+      
+      // Redirect based on role
+      const role = response.role; // Assuming response like { role: 'STUDENT', ... }
+      if (role === 'TEACHER') {
+        navigate('/teacher/dashboard');
+      } else {
+        navigate('/student/dashboard');
+      }
     } catch (err) {
       setError(err?.message || 'Login failed. Please check your credentials.');
       console.error('Login error:', err);
