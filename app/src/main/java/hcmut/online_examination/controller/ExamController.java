@@ -6,6 +6,8 @@ import hcmut.online_examination.dto.ExamResultDto;
 import hcmut.online_examination.dto.JoinExamRequest;
 import hcmut.online_examination.dto.SubmitExamRequest;
 import hcmut.online_examination.dto.UpdateExamPasscodeRequest;
+import hcmut.online_examination.dto.GetExamCorrectAnswersRequest;
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
 import hcmut.online_examination.mappers.ExamMapper; 
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
@@ -81,11 +83,32 @@ public class ExamController {
         return examService.countAttempts(examCode, examineeId);
     }
 
-    @GetMapping("/results")
+    @GetMapping(value = "/results", params = {"examCode", "!userId"})
     public List<ExamResultDto> getExamResults(@RequestParam String examCode) {
         return examService.findAllExamResult(examCode)
                 .stream()
                 .map(ExamMapper::toExamResultDto)
                 .toList(); 
+    }
+
+    @GetMapping(value = "/results", params = {"examCode", "userId"})
+    public List<ExamResultDto> getExamResultsByUser(
+            @RequestParam String examCode,
+            @RequestParam Long userId
+    ) {
+        return examService.findAllExamResultByUser(examCode, userId)
+                .stream()
+                .map(ExamMapper::toExamResultDto)
+                .toList();
+    }
+
+    @PostMapping("/correct-answers")
+    public List<QuestionWithCorrectAnswersDto> getExamCorrectAnswers(
+            @RequestBody @Valid GetExamCorrectAnswersRequest request
+    ) {
+        return examService.getCorrectOptions(
+                request.examCode(),
+                request.requestUserId()
+        );
     }
 }

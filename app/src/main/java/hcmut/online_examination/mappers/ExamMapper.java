@@ -2,11 +2,13 @@ package hcmut.online_examination.mappers;
 
 import hcmut.online_examination.dto.ExamDto;
 import hcmut.online_examination.dto.ExamResultDto;
+import hcmut.online_examination.dto.ExamineeAnswerDto;
 import hcmut.online_examination.dto.OptionDto;
 import hcmut.online_examination.dto.QuestionDto;
 import hcmut.online_examination.dto.UserDto;
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
+import hcmut.online_examination.entity.ExamineeAnswerEntity;
 import hcmut.online_examination.entity.OptionEntity;
 import hcmut.online_examination.entity.QuestionEntity;
 import hcmut.online_examination.entity.User;
@@ -16,15 +18,21 @@ import java.util.stream.Collectors;
 public class ExamMapper {
 
     public static ExamDto toExamDto(ExamEntity entity) {
+        return toExamDto(entity, false);
+    }
+
+    public static ExamDto toExamDto(ExamEntity entity, boolean getCorrectAnswer) {
         if (entity == null) return null;
 
         return new ExamDto(
-                (Long) entity.getId(), 
+                (Long) entity.getId(),
                 entity.getExamCode(),
-                entity.getTitle(),
+                entity.getName(), 
+                entity.getStartTime(),
+                entity.getEndTime(),
                 entity.getDurationInMinutes(),
                 entity.getQuestions().stream()
-                        .map(ExamMapper::toQuestionDto)
+                        .map(q -> toQuestionDto(q, getCorrectAnswer))
                         .collect(Collectors.toList())
         );
     }
@@ -33,14 +41,19 @@ public class ExamMapper {
         if (entity == null) return null;
 
         return new ExamResultDto(
+                entity.getExam() != null ? entity.getExam().getName() : null,
                 toUserDto(entity.getExaminee()),
+                entity.getTimeTaken(),
                 entity.getScore(),
                 entity.getTotalScore(),
-                entity.getSubmittedAt()
+                entity.getSubmittedAt(),
+                entity.getAnswers().stream()
+                        .map(a -> toExamineeAnswerDto(a, true)) 
+                        .collect(Collectors.toList())
         );
     }
 
-    public static QuestionDto toQuestionDto(QuestionEntity entity) {
+    public static QuestionDto toQuestionDto(QuestionEntity entity, boolean getCorrectAnswer) {
         if (entity == null) return null;
 
         return new QuestionDto(
@@ -48,17 +61,27 @@ public class ExamMapper {
                 entity.getQuestion(),
                 entity.getScore(),
                 entity.getOptions().stream()
-                        .map(ExamMapper::toOptionDto)
+                        .map(o -> toOptionDto(o, getCorrectAnswer))
                         .collect(Collectors.toList())
         );
     }
 
-    public static OptionDto toOptionDto(OptionEntity entity) {
+    public static OptionDto toOptionDto(OptionEntity entity, boolean getCorrectAnswer) {
         if (entity == null) return null;
 
         return new OptionDto(
                 entity.getId(),
                 entity.getContent(),
+                getCorrectAnswer ? entity.getIsCorrect() : false 
+        );
+    }
+
+    public static ExamineeAnswerDto toExamineeAnswerDto(ExamineeAnswerEntity entity, boolean getCorrectAnswer) {
+        if (entity == null) return null;
+
+        return new ExamineeAnswerDto(
+                toQuestionDto(entity.getQuestion(), getCorrectAnswer),
+                entity.getOption() != null ? entity.getOption().getId() : null,
                 entity.getIsCorrect()
         );
     }
@@ -68,12 +91,11 @@ public class ExamMapper {
 
         return new UserDto(
                 (Long) entity.getId(),
-                null, // email
+                null, 
                 entity.getUsername(),
-                false 
+                false
         );
     }
-
 
     public static QuestionEntity toQuestionEntity(QuestionDto dto) {
         if (dto == null) return null;

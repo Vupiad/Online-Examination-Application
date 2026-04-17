@@ -17,13 +17,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -50,7 +50,7 @@ public class ExamEntity {
     private String passcode;
 
     @Column(nullable = false)
-    private String title;
+    private String name; 
 
     @Column(nullable = false)
     @Builder.Default

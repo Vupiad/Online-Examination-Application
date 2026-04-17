@@ -3,7 +3,7 @@ package hcmut.online_examination.service;
 import hcmut.online_examination.dto.QuestionAnswerDto;
 import hcmut.online_examination.dto.QuestionDto;
 import hcmut.online_examination.dto.OptionDto;
-
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto; 
 import hcmut.online_examination.mappers.ExamMapper; 
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
@@ -12,6 +12,7 @@ import hcmut.online_examination.entity.QuestionEntity;
 import hcmut.online_examination.entity.User; 
 import hcmut.online_examination.exception.DuplicateExamCodeException;
 import hcmut.online_examination.exception.ExamNotFoundException;
+import hcmut.online_examination.exception.ForbiddenException;
 import hcmut.online_examination.exception.InvalidExamPasscodeException;
 import hcmut.online_examination.exception.MaxAttemptsExceededException;
 import hcmut.online_examination.exception.UserNotFoundException;
@@ -53,8 +54,8 @@ public class ExamService {
     public ExamEntity createExam(
             Long ownerId, 
             String examCode,
-            String title,
-            Long duration,
+            String name,
+            Long durationInMinutes,
             Integer maxAttempts,
             List<QuestionDto> questions,
             Instant startTime,
@@ -68,11 +69,11 @@ public class ExamService {
         }
 
         ExamEntity exam = ExamEntity.builder()
-                .title(title)
+                .name(name)
                 .maxAttempts(maxAttempts)
                 .startTime(startTime)
                 .endTime(endTime)
-                .durationInMinutes(duration)
+                .durationInMinutes(durationInMinutes)
                 .owner(user)
                 .examCode(examCode)
                 .build();
@@ -98,7 +99,6 @@ public class ExamService {
             throw new InvalidExamPasscodeException();
         }
 
-        // Gọi đúng userId
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -113,11 +113,10 @@ public class ExamService {
     @Transactional
     public ExamResultEntity submitExam(
             String examCode,
-            Long examineeId, // Đã đổi examineeId thành Long
+            Long examineeId,
             Instant startTime,
             List<QuestionAnswerDto> answers
     ) {
-        // Đã sửa biến thành examinee và gọi đúng examineeId
         User examinee = userRepository.findById(examineeId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -159,8 +158,7 @@ public class ExamService {
                 .totalScore(totalScore)
                 .submittedAt(Instant.now())
                 .exam(exam)
-                .examinee(examinee) // Đã map đúng biến examine
-                .startTime(startTime)
+                .examinee(examinee)
                 .build();
 
         return examResultRepository.save(attempt);
@@ -181,5 +179,38 @@ public class ExamService {
                 .orElseThrow(ExamNotFoundException::new);
 
         return examResultRepository.findAllByExam(exam);
+    }
+
+    public List<ExamResultEntity> findAllExamResultByUser(String examCode, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        ExamEntity exam = examRepository.findFullExam(examCode)
+                .orElseThrow(ExamNotFoundException::new);
+
+        // Filter the exam results list to return only those belonging to the specific User
+        return examResultRepository.findAllByExam(exam).stream()
+                .filter(result -> result.getExaminee().getId().equals(user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<QuestionWithCorrectAnswersDto> getCorrectOptions(String examCode, Long ownerId) {
+        ExamEntity exam = examRepository.findFullExam(examCode)
+                .orElseThrow(ExamNotFoundException::new);
+
+        // Check if the requester is the owner of the exam
+        if (!exam.getOwner().getId().equals(ownerId)) {
+            throw new ForbiddenException("Only owner of the exam can get the correct options.");
+        }
+
+        return exam.getQuestions().stream().map(question -> {
+            Long correctOptionId = question.getOptions().stream()
+                    .filter(OptionEntity::getIsCorrect)
+                    .map(OptionEntity::getId)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Question missing correct option!"));
+
+            return new QuestionWithCorrectAnswersDto(question.getId(), correctOptionId);
+        }).collect(Collectors.toList());
     }
 }
