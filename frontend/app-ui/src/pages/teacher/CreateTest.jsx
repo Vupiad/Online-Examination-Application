@@ -159,7 +159,7 @@ const CreateTest = () => {
       alert(
         "Thiết lập thành công! Học sinh đã có thể dùng mã và passcode để thi.",
       );
-      navigate("/dashboard");
+      navigate("/teacher/dashboard");
     } catch (err) {
       console.error("Lỗi cập nhật passcode:", err);
       alert("Lỗi khi thiết lập passcode.");

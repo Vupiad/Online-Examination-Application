@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import LandingPage from "./pages/landingpage/landingpage";
 import TakeTest from "./pages/student/TakeTest";
 import TestInterface from "./pages/student/TestInterface";
 import CreateTest from "./pages/teacher/CreateTest";
+import ExamResults from "./pages/teacher/ExamResults";
 // Import Layout
 import StudentLayout from "./components/StudentLayout";
 import TeacherLayout from "./components/TeacherLayout";
@@ -38,6 +39,11 @@ function App() {
             element={<div className="p-8">Đây là trang Teacher Dashboard</div>}
           />
           <Route path="/teacher/create-test" element={<CreateTest />} />
+          <Route
+            path="/teacher/results"
+            element={<Navigate to="/teacher/dashboard" replace />}
+          />
+          <Route path="/teacher/results/:examCode" element={<ExamResults />} />
         </Route>
       </Routes>
     </Router>
