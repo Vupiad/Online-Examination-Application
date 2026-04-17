@@ -1,59 +1,74 @@
-import React, { useState } from 'react';
-import { BookOpen, User, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
+import React, { useState } from "react";
+import {
+  BookOpen,
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../services/authService";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       const response = await authService.login({ username, password });
-      console.log('Login success:', response);
-      navigate('/'); 
+      console.log("Login success:", response);
+      navigate("/");
     } catch (err) {
-      setError(err?.message || 'Login failed. Please check your credentials.');
-      console.error('Login error:', err);
+      setError(err?.message || "Login failed. Please check your credentials.");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
-      <div className="card">
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ background: 'var(--primary)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'white' }}>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] font-['Inter']">
+      <div className="w-full max-w-md p-10 bg-white shadow-xl rounded-2xl border border-gray-100 animate-[fadeIn_0.4s_ease-out]">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-white bg-[#026880] rounded-xl shadow-md">
             <BookOpen size={24} />
           </div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '0.25rem' }}>Assessment Management</h1>
-          <p style={{ color: 'var(--text-grey)', fontSize: '0.925rem' }}>Welcome back</p>
+          <h1 className="text-2xl font-bold text-[#026880] mb-1">
+            Assessment Management
+          </h1>
+          <p className="text-gray-500 text-sm">Welcome back</p>
         </div>
 
+        {/* Error Alert */}
         {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fee2e2', color: '#b91c1c', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', fontSize: '0.875rem', textAlign: 'center' }}>
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-6 text-sm text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label className="input-label">Username</label>
-            <div className="input-wrapper">
-              <User size={18} className="input-icon" />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">
+              Username
+            </label>
+            <div className="relative flex items-center">
+              <User size={18} className="absolute left-4 text-gray-400" />
               <input
                 type="text"
-                className="input-field"
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#026880]/20 focus:border-[#026880] focus:bg-white outline-none transition-all"
                 placeholder="john_doe"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -62,13 +77,15 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Password</label>
-            <div className="input-wrapper">
-              <Lock size={18} className="input-icon" />
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <Lock size={18} className="absolute left-4 text-gray-400" />
               <input
                 type={showPassword ? "text" : "password"}
-                className="input-field"
+                className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#026880]/20 focus:border-[#026880] focus:bg-white outline-none transition-all"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -76,7 +93,7 @@ const Login = () => {
               />
               <button
                 type="button"
-                className="password-toggle"
+                className="absolute right-4 text-gray-400 hover:text-[#026880] focus:outline-none transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -84,43 +101,68 @@ const Login = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-grey)' }}>
+          <div className="flex justify-between items-center mb-6 text-sm">
+            <label className="flex items-center gap-2 cursor-pointer text-gray-500 hover:text-gray-700 font-medium">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                style={{ accentColor: 'var(--primary)' }}
+                className="w-4 h-4 text-[#026880] border-gray-300 rounded focus:ring-[#026880]"
               />
               Remember me
             </label>
-            <Link to="/forgot-password" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Forgot password?</Link>
+            <Link
+              to="/forgot-password"
+              className="font-bold text-[#026880] hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 py-3.5 text-white bg-[#026880] hover:bg-[#004d5a] disabled:bg-[#026880]/70 rounded-lg font-bold shadow-lg shadow-[#026880]/20 transition-all active:scale-[0.98] disabled:active:scale-100"
+          >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
             ) : (
-              <>Sign In <ArrowRight size={18} /></>
+              <>
+                Sign In <ArrowRight size={18} />
+              </>
             )}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.875rem', color: 'var(--text-grey)' }}>
-          Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '700', textDecoration: 'none' }}>Register now</Link>
+        <p className="text-center mt-8 text-sm text-gray-500 font-medium">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="font-bold text-[#026880] hover:underline"
+          >
+            Register now
+          </Link>
         </p>
       </div>
 
-      <p style={{ maxWidth: '600px', textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem', marginTop: '1rem', fontStyle: 'italic', lineHeight: '1.6' }}>
+      <p className="max-w-[600px] mx-auto text-center text-gray-400 text-sm mt-8 italic leading-relaxed">
         "Silence is not the absence of sound, but the presence of attention."
       </p>
 
-      <footer className="footer-links" style={{ width: '100%', maxWidth: '1100px', padding: '2rem 1rem' }}>
-        <div>© 2024 Assessment Management. All rights reserved.</div>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
-          <Link to="#">Privacy Policy</Link>
-          <Link to="#">Terms of Service</Link>
-          <Link to="#">Help Center</Link>
+      <footer className="w-full max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center py-8 mt-auto text-xs md:text-sm text-gray-400 font-medium">
+        <div className="mb-4 md:mb-0">
+          © 2024 Assessment Management. All rights reserved.
+        </div>
+        <div className="flex gap-6">
+          <Link to="#" className="hover:text-[#026880] transition-colors">
+            Privacy Policy
+          </Link>
+          <Link to="#" className="hover:text-[#026880] transition-colors">
+            Terms of Service
+          </Link>
+          <Link to="#" className="hover:text-[#026880] transition-colors">
+            Help Center
+          </Link>
         </div>
       </footer>
     </div>
