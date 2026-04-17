@@ -1,3 +1,9 @@
+/* src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --primary: #026880;
+  --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -31,8 +37,8 @@
 body {
   font-family: 'Outfit', sans-serif;
   background: var(--bg-gradient);
-  color: var(--text-dark);
   min-height: 100vh;
+}
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }

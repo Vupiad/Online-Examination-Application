@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "./StudentSidebar";
 import {
   Bell,
   CircleHelp,
@@ -18,9 +18,9 @@ const StudentLayout = () => {
       {/* Component Sidebar dùng chung cho Desktop */}
       <Sidebar />
 
-      {/* Main Container - Chừa khoảng trống 64 (16rem) bên trái cho Sidebar trên Desktop */}
+      {/* Main Container */}
       <div className="flex-1 md:ml-64 flex flex-col min-h-screen relative">
-        {/* Header (Chỉ hiện trên Mobile) */}
+        {/* Header  */}
         <header className="md:hidden flex justify-between items-center px-8 py-4 w-full top-0 sticky bg-[#f7fafc] z-50 border-b border-[#dbe4e9]">
           <div className="text-xl font-bold text-[#026880] tracking-tight font-['Be_Vietnam_Pro']">
             The Serene Scholar
@@ -31,12 +31,10 @@ const StudentLayout = () => {
           </div>
         </header>
 
-        {/* Nội dung chính của trang sẽ được chèn vào <Outlet /> */}
         <main className="flex-1 pb-20 md:pb-0 relative overflow-hidden">
           <Outlet />
         </main>
 
-        {/* Bottom Navigation (Chỉ hiện trên Mobile) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f7fafc] flex justify-around py-4 border-t border-[#dbe4e9] z-50">
           <Link
             to="/dashboard"
