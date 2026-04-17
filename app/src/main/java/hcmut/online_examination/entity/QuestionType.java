@@ -1,6 +1,7 @@
 package hcmut.online_examination.entity;
 
 public enum QuestionType {
-    MULTIPLE_CHOICE,
+    SINGLE_CHOICE,
+    MULTI_CHOICE,
     CODING
 }

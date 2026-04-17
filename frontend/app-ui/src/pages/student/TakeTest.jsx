@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Key, Lock, ShieldCheck, Headset, AlertCircle } from "lucide-react";
+import { Key, Lock, ShieldCheck, Headset, Loader2 } from "lucide-react";
 import api from "../../services/api";
 
 const TakeTest = () => {
@@ -14,38 +14,43 @@ const TakeTest = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    try {
-      const response = await api.get(`/api/exams/${testCode}`);
-      const exam = response.data;
-      
-      if (exam.passcode && exam.passcode !== passcode) {
-        setError("Mật mã bài thi không chính xác!");
-        setLoading(false);
-        return;
-      }
 
-      // Navigate to Intro with exam data
-      navigate(`/exam-intro/${exam.id}`, { state: { exam } });
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const userId = currentUser?.id || 1;
+
+      const payload = {
+        examCode: testCode,
+        userId: userId,
+        passcode: passcode,
+      };
+
+      const response = await api.post("/api/exam/join", payload);
+
+      console.log("Bắt đầu tham gia bài thi thành công:", response.data);
+
+      navigate(`/exam/${testCode}`, { state: { examData: response.data } });
     } catch (err) {
-      setError("Không tìm thấy bài thi với mã này hoặc có lỗi hệ thống.");
-      console.error(err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Không thể tham gia bài thi. Vui lòng kiểm tra lại mã bài thi và mật khẩu.";
+      setError(errorMessage);
+      console.error("Lỗi khi join exam:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 md:p-12 min-h-full">
-      {/* Progress Bar */}
+    <div className="flex flex-col items-center justify-center p-6 md:p-12 min-h-full animate-[fadeIn_0.4s_ease-out]">
       <div className="absolute top-0 left-0 right-0 h-1 bg-[#dbe4e9]">
         <div className="w-1/4 h-full bg-[#026880] transition-all duration-500"></div>
       </div>
 
-      {/* Central Card */}
       <div className="w-full max-w-2xl z-10 mt-8 md:mt-12">
-        <div className="bg-[#ffffff] rounded-xl p-8 md:p-14 shadow-sm transition-all duration-300">
+        <div className="bg-[#ffffff] rounded-xl p-8 md:p-14 shadow-sm border border-gray-100 transition-all duration-300">
           <div className="mb-12 text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-['Be_Vietnam_Pro'] font-bold text-[#2b3437] tracking-tight mb-4 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2b3437] tracking-tight mb-4 leading-tight">
               Take a New Test
             </h2>
             <p className="text-[#576065] max-w-lg leading-relaxed">
@@ -55,15 +60,13 @@ const TakeTest = () => {
           </div>
 
           {error && (
-            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-lg flex items-center gap-3 text-red-600 animate-shake">
-              <AlertCircle size={20} />
-              <p className="text-sm font-bold m-0">{error}</p>
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8 text-sm text-center">
+              {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 gap-8">
-              {/* Test Code */}
               <div className="group">
                 <label className="block text-xs font-semibold text-[#026880] uppercase tracking-widest mb-2 px-1">
                   TEST ID / CODE
@@ -84,7 +87,6 @@ const TakeTest = () => {
                 </div>
               </div>
 
-              {/* Passcode */}
               <div className="group">
                 <label className="block text-xs font-semibold text-[#026880] uppercase tracking-widest mb-2 px-1">
                   ACCESS CODE
@@ -110,17 +112,21 @@ const TakeTest = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full md:w-auto px-10 py-4 font-bold shadow-lg rounded-xl transition-all active:scale-[0.98] ${
-                  loading ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-[#026880] hover:bg-[#005b70] text-[#f1faff] shadow-[#026880]/10'
-                }`}
+                className="w-full md:w-auto px-10 py-4 flex items-center justify-center gap-2 bg-[#026880] hover:bg-[#005b70] disabled:bg-[#026880]/70 text-[#f1faff] rounded-xl font-bold shadow-lg shadow-[#026880]/10 transition-all active:scale-[0.98] disabled:active:scale-100"
               >
-                {loading ? 'Validating...' : 'Start Test'}
+                {loading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  "Start Test"
+                )}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Footer Meta */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60">
           <div className="flex items-start gap-4 p-4 rounded-lg bg-[#eff4f7]">
             <ShieldCheck className="text-[#026880] mt-1 shrink-0" size={20} />
@@ -148,9 +154,8 @@ const TakeTest = () => {
         </div>
       </div>
 
-      {/* Background Decoration */}
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#94dffb]/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
-      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-[#cee7ec]/30 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+      <div className="fixed top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#94dffb]/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-[#cee7ec]/30 rounded-full blur-[80px] pointer-events-none -z-10"></div>
     </div>
   );
 };

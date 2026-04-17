@@ -6,7 +6,7 @@ import java.util.List;
 
 public record QuestionDto(
         Long questionId,
-        String question,
+        String content,
         BigDecimal score,
         List<OptionDto> options,
         QuestionType type,
@@ -18,11 +18,14 @@ public record QuestionDto(
         if (score == null) {
             score = BigDecimal.ZERO;
         }
+        if (content == null) {
+            content = "";
+        }
         if (options == null) {
             options = List.of();
         }
         if (type == null) {
-            type = QuestionType.MULTIPLE_CHOICE;
+            type = QuestionType.SINGLE_CHOICE;
         }
     }
 }

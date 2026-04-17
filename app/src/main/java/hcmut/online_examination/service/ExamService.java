@@ -1,36 +1,25 @@
 package hcmut.online_examination.service;
 
+import hcmut.online_examination.dto.OptionDto;
 import hcmut.online_examination.dto.QuestionAnswerDto;
 import hcmut.online_examination.dto.QuestionDto;
-import hcmut.online_examination.dto.OptionDto;
-
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
+import hcmut.online_examination.entity.*;
+import hcmut.online_examination.exception.*;
 import hcmut.online_examination.mappers.ExamMapper;
-import hcmut.online_examination.entity.ExamEntity;
-import hcmut.online_examination.entity.ExamResultEntity;
-import hcmut.online_examination.entity.OptionEntity;
-import hcmut.online_examination.entity.QuestionEntity;
-import hcmut.online_examination.entity.User;
-import hcmut.online_examination.exception.DuplicateExamCodeException;
-import hcmut.online_examination.exception.ExamNotFoundException;
-import hcmut.online_examination.exception.InvalidExamPasscodeException;
-import hcmut.online_examination.exception.MaxAttemptsExceededException;
-import hcmut.online_examination.exception.UserNotFoundException;
-import hcmut.online_examination.repository.ExamRepository;
-import hcmut.online_examination.repository.ExamResultRepository;
-import hcmut.online_examination.repository.OptionRepository;
-import hcmut.online_examination.repository.QuestionRepository;
-import hcmut.online_examination.repository.UserRepository;
+import hcmut.online_examination.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import hcmut.online_examination.entity.QuestionType;
 
 @Service
 @RequiredArgsConstructor
@@ -54,16 +43,15 @@ public class ExamService {
 
     @Transactional
     public ExamEntity createExam(
-            Long ownerId, // Đã đổi thành Long
+            Long ownerId,
             String examCode,
-            String title,
-            Long duration,
+            String name,
+            Long durationInMinutes,
             Integer maxAttempts,
             List<QuestionDto> questions,
             Instant startTime,
             Instant endTime
     ) {
-        // Truyền thẳng ownerId
         User user = userRepository.findById(ownerId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -72,13 +60,14 @@ public class ExamService {
         }
 
         ExamEntity exam = ExamEntity.builder()
-                .title(title)
-                .maxAttempts(maxAttempts)
-                .startTime(startTime)
+                .name(name)
+                .maxAttempts(maxAttempts != null ? maxAttempts : 1)
+                .startTime(startTime != null ? startTime : Instant.now())
                 .endTime(endTime)
-                .durationInMinutes(duration)
+                .durationInMinutes(durationInMinutes)
                 .owner(user)
                 .examCode(examCode)
+                .status(ExamEntity.ExamStatus.OPEN)
                 .build();
 
         for (QuestionDto qDto : questions) {
@@ -102,7 +91,6 @@ public class ExamService {
             throw new InvalidExamPasscodeException();
         }
 
-        // Gọi đúng userId
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -117,11 +105,10 @@ public class ExamService {
     @Transactional
     public ExamResultEntity submitExam(
             String examCode,
-            Long examineeId, // Đã đổi examineeId thành Long
+            Long examineeId,
             Instant startTime,
             List<QuestionAnswerDto> answers
     ) {
-        // Đã sửa biến thành examinee và gọi đúng examineeId
         User examinee = userRepository.findById(examineeId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -138,51 +125,56 @@ public class ExamService {
 
         BigDecimal score = BigDecimal.ZERO;
         BigDecimal totalScore = BigDecimal.ZERO;
+        List<ExamineeAnswerEntity> studentAnswers = new ArrayList<>();
 
         for (QuestionAnswerDto answer : answers) {
             QuestionEntity question = questionMap.get(answer.questionId());
-            if (question == null) {
-                throw new IllegalArgumentException("Invalid question: " + answer.questionId());
-            }
+            if (question == null) continue; // Skip invalid questions
+
+            ExamineeAnswerEntity studentAnswer = ExamineeAnswerEntity.builder()
+                    .question(question)
+                    .build();
 
             if (question.getType() == QuestionType.CODING) {
-                if (answer.answerCode() != null) {
-                    JudgeService.JudgeResult result = judgeService.judge(
-                            answer.answerCode(),
-                            answer.language(),
-                            question.getTestCases()
-                    );
-                    if (result.isSuccess() && result.getTotalCount() > 0) {
-                        BigDecimal ratio = BigDecimal.valueOf(result.getPassedCount())
-                                .divide(BigDecimal.valueOf(result.getTotalCount()), 2, RoundingMode.HALF_UP);
-                        score = score.add(question.getScore().multiply(ratio));
-                    }
-                }
+                // Future implementation: Coding judge
+                totalScore = totalScore.add(question.getScore());
             } else {
-                if (answer.optionId() != null) {
+                if (answer.selectedOptionId() != null) {
                     OptionEntity selectedOption = question.getOptions().stream()
-                            .filter(o -> o.getId().equals(answer.optionId()))
+                            .filter(o -> o.getId().equals(answer.selectedOptionId()))
                             .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("Invalid option for question " + question.getId()));
+                            .orElse(null);
 
-                    if (selectedOption.getIsCorrect()) {
-                        score = score.add(question.getScore());
+                    if (selectedOption != null) {
+                        studentAnswer.setOption(selectedOption);
+                        if (selectedOption.getIsCorrect()) {
+                            studentAnswer.setIsCorrect(true);
+                            score = score.add(question.getScore());
+                        }
                     }
                 }
+                totalScore = totalScore.add(question.getScore());
             }
-            totalScore = totalScore.add(question.getScore());
+            studentAnswers.add(studentAnswer);
         }
 
-        ExamResultEntity attempt = ExamResultEntity.builder()
+        Instant submissionTime = Instant.now();
+        long timeTakenSeconds = (startTime != null) ? Duration.between(startTime, submissionTime).getSeconds() : 0;
+
+        ExamResultEntity result = ExamResultEntity.builder()
                 .score(score)
                 .totalScore(totalScore)
-                .submittedAt(Instant.now())
+                .submittedAt(submissionTime)
+                .timeTaken(timeTakenSeconds)
                 .exam(exam)
-                .examinee(examinee) // Đã map đúng biến examine
-                .startTime(startTime)
+                .examinee(examinee)
                 .build();
 
-        return examResultRepository.save(attempt);
+        for (ExamineeAnswerEntity sa : studentAnswers) {
+            result.addAnswer(sa);
+        }
+
+        return examResultRepository.save(result);
     }
 
     public long countAttempts(String examCode, Long userId) {
@@ -200,5 +192,51 @@ public class ExamService {
                 .orElseThrow(ExamNotFoundException::new);
 
         return examResultRepository.findAllByExam(exam);
+    }
+
+    public List<ExamResultEntity> findAllExamResultByUser(String examCode, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        ExamEntity exam = examRepository.findFullExam(examCode)
+                .orElseThrow(ExamNotFoundException::new);
+
+        return examResultRepository.findAllByExam(exam).stream()
+                .filter(result -> result.getExaminee().getId().equals(user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<QuestionWithCorrectAnswersDto> getCorrectOptions(String examCode, Long ownerId) {
+        ExamEntity exam = examRepository.findFullExam(examCode)
+                .orElseThrow(ExamNotFoundException::new);
+
+        if (!exam.getOwner().getId().equals(ownerId)) {
+            throw new ForbiddenException("Only owner of the exam can get the correct options.");
+        }
+
+        return exam.getQuestions().stream()
+                .map(question -> {
+                    Long correctOptionId = question.getOptions().stream()
+                            .filter(OptionEntity::getIsCorrect)
+                            .map(OptionEntity::getId)
+                            .findFirst()
+                            .orElse(null);
+
+                    return new QuestionWithCorrectAnswersDto(question.getId(), correctOptionId);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<ExamEntity> getAllExams() {
+        return examRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public Map<String, Object> getStats() {
+        long openCount = examRepository.countByStatus(ExamEntity.ExamStatus.OPEN);
+        return Map.of(
+            "openExamsCount", openCount,
+            "studentsTestingCount", 0, 
+            "completionRateToday", 0
+        );
     }
 }

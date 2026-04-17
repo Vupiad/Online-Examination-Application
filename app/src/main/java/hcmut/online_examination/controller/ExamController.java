@@ -3,12 +3,14 @@ package hcmut.online_examination.controller;
 import hcmut.online_examination.dto.CreateExamRequest;
 import hcmut.online_examination.dto.ExamDto;
 import hcmut.online_examination.dto.ExamResultDto;
+import hcmut.online_examination.dto.GetExamCorrectAnswersRequest;
 import hcmut.online_examination.dto.JoinExamRequest;
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
 import hcmut.online_examination.dto.SubmitExamRequest;
 import hcmut.online_examination.dto.UpdateExamPasscodeRequest;
-import hcmut.online_examination.mappers.ExamMapper;
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
+import hcmut.online_examination.mappers.ExamMapper;
 import hcmut.online_examination.service.ExamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,11 +83,44 @@ public class ExamController {
         return examService.countAttempts(examCode, examineeId);
     }
 
-    @GetMapping("/results")
+    @GetMapping(value = "/results", params = {"examCode", "!userId"})
     public List<ExamResultDto> getExamResults(@RequestParam String examCode) {
         return examService.findAllExamResult(examCode)
                 .stream()
                 .map(ExamMapper::toExamResultDto)
                 .toList();
+    }
+
+    @GetMapping(value = "/results", params = {"examCode", "userId"})
+    public List<ExamResultDto> getExamResultsByUser(
+            @RequestParam String examCode,
+            @RequestParam Long userId
+    ) {
+        return examService.findAllExamResultByUser(examCode, userId)
+                .stream()
+                .map(ExamMapper::toExamResultDto)
+                .toList();
+    }
+
+    @PostMapping("/correct-answers")
+    public List<QuestionWithCorrectAnswersDto> getExamCorrectAnswers(
+            @RequestBody @Valid GetExamCorrectAnswersRequest request
+    ) {
+        return examService.getCorrectOptions(
+                request.examCode(),
+                request.requestUserId()
+        );
+    }
+
+    @GetMapping
+    public List<ExamDto> getAllExams() {
+        return examService.getAllExams().stream()
+                .map(ExamMapper::toExamDto)
+                .toList();
+    }
+
+    @GetMapping("/stats")
+    public java.util.Map<String, Object> getStats() {
+        return examService.getStats();
     }
 }

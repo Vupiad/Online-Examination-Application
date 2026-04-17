@@ -17,13 +17,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(
@@ -49,8 +51,8 @@ public class ExamEntity {
 
     private String passcode;
 
-    @Column(nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false) 
+    private String name; 
 
     @Column(nullable = false)
     @Builder.Default
@@ -73,6 +75,15 @@ public class ExamEntity {
         updatable = false
     )
     private User owner;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ExamStatus status = ExamStatus.DRAFT;
+
+    public enum ExamStatus {
+        OPEN, CLOSED, DRAFT
+    }
 
     @OneToMany(
         mappedBy = "exam",

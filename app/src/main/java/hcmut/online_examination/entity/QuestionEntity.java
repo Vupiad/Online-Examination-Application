@@ -36,7 +36,7 @@ public class QuestionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "content", nullable = false)
     private String question; 
 
     @Column(precision = 5, scale = 2)
@@ -62,7 +62,7 @@ public class QuestionEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private QuestionType type = QuestionType.MULTIPLE_CHOICE;
+    private QuestionType type = QuestionType.SINGLE_CHOICE;
 
     @Column(columnDefinition = "TEXT")
     private String starterCode;

@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ExamRepository extends JpaRepository<ExamEntity, UUID> {
+public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
 
-    Optional<ExamEntity> findByPasscodeAndId(String passcode, UUID id);
+    Optional<ExamEntity> findByPasscodeAndId(String passcode, Long id);
 
     Optional<ExamEntity> findByExamCode(String examCode);
 
@@ -22,22 +23,11 @@ public interface ExamRepository extends JpaRepository<ExamEntity, UUID> {
 
     Optional<ExamEntity> findByExamCodeAndOwner(String examCode, User user);
 
-    // @Query("""
-    // SELECT e FROM ExamEntity e
-    // JOIN FETCH e.questions q
-    // JOIN FETCH q.answers
-    // WHERE e.examCode = :examCode
-    // """)
-    // Optional<ExamEntity> findFullExamByExamCode(@Param("examCode") String examCode);
-
-    // @Query("""
-    //     SELECT e FROM ExamEntity e
-    //     JOIN FETCH e.questions
-    //     WHERE e.examCode = :examCode
-    // """)
-    // Optional<ExamEntity> findFullExamWithQuestions(@Param("examCode") String examCode);
-
     @EntityGraph(attributePaths = {"questions", "questions.options"})
     @Query("SELECT e FROM ExamEntity e WHERE e.examCode = :examCode")
     Optional<ExamEntity> findFullExam(@Param("examCode") String examCode);
+
+    List<ExamEntity> findAllByOrderByCreatedAtDesc();
+
+    long countByStatus(ExamEntity.ExamStatus status);
 }
