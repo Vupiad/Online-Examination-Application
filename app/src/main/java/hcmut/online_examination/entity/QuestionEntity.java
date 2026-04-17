@@ -35,7 +35,7 @@ public class QuestionEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String question; 
+    private String content; 
 
     @Column(precision = 5, scale = 2)
     @Builder.Default

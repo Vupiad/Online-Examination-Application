@@ -9,11 +9,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
 
-    Optional<ExamEntity> findByPasscodeAndId(String passcode, Long id);
+    Optional<ExamEntity> findByPasscodeAndId(String passcode, UUID id);
 
     Optional<ExamEntity> findByExamCode(String examCode);
 
@@ -39,15 +40,4 @@ public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
     @EntityGraph(attributePaths = {"questions", "questions.options"})
     @Query("SELECT e FROM ExamEntity e WHERE e.examCode = :examCode")
     Optional<ExamEntity> findFullExam(@Param("examCode") String examCode);
-    @EntityGraph(attributePaths = {"questions", "questions.options"})
-    @Query("""
-        SELECT e 
-        FROM ExamEntity e 
-        WHERE e.examCode = :examCode 
-          AND e.owner = :user
-    """)
-    Optional<ExamEntity> findFullExam(
-            @Param("examCode") String examCode, 
-            @Param("user") User user
-    );
 }
