@@ -20,6 +20,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "questions")
@@ -57,8 +59,30 @@ public class QuestionEntity {
     @Builder.Default
     private Set<OptionEntity> options = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private QuestionType type = QuestionType.MULTIPLE_CHOICE;
+
+    @Column(columnDefinition = "TEXT")
+    private String starterCode;
+
+    @OneToMany(
+        mappedBy = "question",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private Set<TestCaseEntity> testCases = new HashSet<>();
+
     public void addOption(OptionEntity option) {
         this.options.add(option);
         option.setQuestion(this);
+    }
+
+    public void addTestCase(TestCaseEntity testCase) {
+        this.testCases.add(testCase);
+        testCase.setQuestion(this);
     }
 }

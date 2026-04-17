@@ -5,12 +5,14 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Flag, 
-  HelpCircle,
-  Save,
-  Send
+  Send,
+  Code,
+  Terminal,
+  Play
 } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "../../services/api";
+import CodeEditor from "../../components/CodeEditor";
 
 const QuizScreen = () => {
   const navigate = useNavigate();
@@ -20,7 +22,8 @@ const QuizScreen = () => {
   const [loading, setLoading] = useState(!location.state?.exam);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
-  const [answers, setAnswers] = useState({}); // { questionId: selectedOptionId }
+  const [answers, setAnswers] = useState({}); // { questionId: selectedOptionId OR { code, language } }
+  const [activeTab, setActiveTab] = useState("problem"); // "problem" or "output"
 
   useEffect(() => {
     if (!exam) {
@@ -65,6 +68,24 @@ const QuizScreen = () => {
     setAnswers({ ...answers, [questionId]: optionId });
   };
 
+  const handleCodeChange = (questionId, code) => {
+    const currentAnswer = answers[questionId] || { language: "java" };
+    setAnswers({ ...answers, [questionId]: { ...currentAnswer, code } });
+  };
+
+  const handleLanguageChange = (questionId, language) => {
+    const currentAnswer = answers[questionId] || { code: currentQuestion.starterCode || "" };
+    setAnswers({ ...answers, [questionId]: { ...currentAnswer, language } });
+  };
+
+  const runCode = () => {
+    setActiveTab("output");
+    // Simulate running code
+    setTimeout(() => {
+        alert("Đang chạy code thử nghiệm...");
+    }, 500);
+  };
+
   const handleNext = () => {
     if (currentQuestionIdx < exam.questions.length - 1) {
       setCurrentQuestionIdx(currentQuestionIdx + 1);
@@ -74,6 +95,42 @@ const QuizScreen = () => {
   const handlePrev = () => {
     if (currentQuestionIdx > 0) {
       setCurrentQuestionIdx(currentQuestionIdx - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!window.confirm('Bạn có chắc muốn nộp bài?')) return;
+
+    try {
+      const formattedAnswers = Object.entries(answers).map(([qId, val]) => {
+        if (val && typeof val === 'object') {
+          return {
+            questionId: parseInt(qId),
+            answerCode: val.code,
+            language: val.language
+          };
+        }
+        return {
+          questionId: parseInt(qId),
+          optionId: val
+        };
+      });
+
+      console.log("Submitting answers:", formattedAnswers);
+      
+      // In a real flow, we would call the API here:
+      // await api.post(`/api/exam/submit`, {
+      //   examCode: exam.examCode,
+      //   examineeId: 1, // This should come from auth
+      //   startTime: new Date().toISOString(),
+      //   answers: formattedAnswers
+      // });
+
+      alert("Nộp bài thành công!");
+      navigate('/student/dashboard');
+    } catch (error) {
+      console.error("Error submitting exam:", error);
+      alert("Lỗi khi nộp bài");
     }
   };
 
@@ -125,22 +182,65 @@ const QuizScreen = () => {
                 </div>
               )}
 
-              <div className="space-y-3">
-                {currentQuestion.options?.map((opt, oIdx) => (
-                  <div 
-                    key={oIdx} 
-                    className={`quiz-option ${answers[currentQuestion.id] === opt.id ? 'selected' : ''}`}
-                    onClick={() => handleOptionClick(currentQuestion.id, opt.id)}
-                  >
-                    <div className={`w-5 h-5 rounded-full border-2 ${answers[currentQuestion.id] === opt.id ? 'border-[#006070] bg-[#006070] flex items-center justify-center' : 'border-slate-200'}`}>
-                      {answers[currentQuestion.id] === opt.id && <div className="w-2 h-2 rounded-full bg-white"></div>}
+              {currentQuestion.type === 'CODING' ? (
+                <div className="flex flex-col gap-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ngôn ngữ lập trình</span>
+                        <select 
+                          className="p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none cursor-pointer hover:border-[#006070] transition-colors shadow-sm"
+                          value={answers[currentQuestion.id]?.language || "java"}
+                          onChange={(e) => handleLanguageChange(currentQuestion.id, e.target.value)}
+                        >
+                          <option value="java">Java 17 (OpenJDK)</option>
+                          <option value="cpp">C++ 20 (GCC)</option>
+                          <option value="python">Python 3.10</option>
+                        </select>
+                      </div>
                     </div>
-                    <span className={`text-sm ${answers[currentQuestion.id] === opt.id ? 'font-semibold' : 'font-medium'}`}>
-                      {String.fromCharCode(65 + oIdx)}. {opt.content}
-                    </span>
                   </div>
-                ))}
-              </div>
+
+                  <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <CodeEditor 
+                       language={answers[currentQuestion.id]?.language || "java"}
+                       value={answers[currentQuestion.id]?.code ?? (currentQuestion.starterCode || "")}
+                       onChange={(code) => handleCodeChange(currentQuestion.id, code)}
+                       onRun={runCode}
+                    />
+                  </div>
+
+                  <div className="p-6 bg-[#f1f5f9] border border-slate-200 rounded-2xl shadow-inner">
+                     <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-slate-600">
+                           <Terminal size={16} />
+                           <span className="text-xs font-bold uppercase tracking-widest">Console Output</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">Process exited with status 0</span>
+                     </div>
+                     <div className="font-mono text-sm text-slate-400 italic bg-white/50 p-4 rounded-xl border border-dashed border-slate-300">
+                        Chưa có kết quả. Nhấn "RUN" để thực thi mã nguồn của bạn đối với các test case không ẩn.
+                     </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {currentQuestion.options?.map((opt, oIdx) => (
+                    <div 
+                      key={oIdx} 
+                      className={`quiz-option ${answers[currentQuestion.id] === opt.id ? 'selected' : ''}`}
+                      onClick={() => handleOptionClick(currentQuestion.id, opt.id)}
+                    >
+                      <div className={`w-5 h-5 rounded-full border-2 ${answers[currentQuestion.id] === opt.id ? 'border-[#006070] bg-[#006070] flex items-center justify-center' : 'border-slate-200'}`}>
+                        {answers[currentQuestion.id] === opt.id && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                      </div>
+                      <span className={`text-sm ${answers[currentQuestion.id] === opt.id ? 'font-semibold' : 'font-medium'}`}>
+                        {String.fromCharCode(65 + oIdx)}. {opt.content}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -165,7 +265,7 @@ const QuizScreen = () => {
                 <Save size={16} /> Lưu nháp
               </button>
               <button 
-                onClick={() => { if(window.confirm('Bạn có chắc muốn nộp bài?')) navigate('/student/dashboard'); }}
+                onClick={handleSubmit}
                 className="flex items-center gap-2 px-6 py-2.5 bg-[#006070] text-white border-none rounded-lg text-xs font-bold shadow-md shadow-[#006070]/20 hover:bg-[#004d5a]"
               >
                 Nộp bài <Send size={16} />

@@ -4,11 +4,13 @@ import hcmut.online_examination.dto.ExamDto;
 import hcmut.online_examination.dto.ExamResultDto;
 import hcmut.online_examination.dto.OptionDto;
 import hcmut.online_examination.dto.QuestionDto;
+import hcmut.online_examination.dto.TestCaseDto;
 import hcmut.online_examination.dto.UserDto;
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
 import hcmut.online_examination.entity.OptionEntity;
 import hcmut.online_examination.entity.QuestionEntity;
+import hcmut.online_examination.entity.TestCaseEntity;
 import hcmut.online_examination.entity.User;
 
 import java.util.stream.Collectors;
@@ -49,7 +51,23 @@ public class ExamMapper {
                 entity.getScore(),
                 entity.getOptions().stream()
                         .map(ExamMapper::toOptionDto)
+                        .collect(Collectors.toList()),
+                entity.getType(),
+                entity.getStarterCode(),
+                entity.getTestCases().stream()
+                        .map(ExamMapper::toTestCaseDto)
                         .collect(Collectors.toList())
+        );
+    }
+
+    public static TestCaseDto toTestCaseDto(TestCaseEntity entity) {
+        if (entity == null) return null;
+
+        return new TestCaseDto(
+                entity.getId(),
+                entity.getInput(),
+                entity.getExpectedOutput(),
+                entity.isHidden()
         );
     }
 
@@ -78,9 +96,27 @@ public class ExamMapper {
     public static QuestionEntity toQuestionEntity(QuestionDto dto) {
         if (dto == null) return null;
 
-        return QuestionEntity.builder()
+        QuestionEntity entity = QuestionEntity.builder()
                 .question(dto.question())
                 .score(dto.score())
+                .type(dto.type())
+                .starterCode(dto.starterCode())
+                .build();
+        
+        if (dto.testCases() != null) {
+            dto.testCases().forEach(tc -> entity.addTestCase(toTestCaseEntity(tc)));
+        }
+        
+        return entity;
+    }
+
+    public static TestCaseEntity toTestCaseEntity(TestCaseDto dto) {
+        if (dto == null) return null;
+
+        return TestCaseEntity.builder()
+                .input(dto.input())
+                .expectedOutput(dto.expectedOutput())
+                .isHidden(dto.isHidden())
                 .build();
     }
 

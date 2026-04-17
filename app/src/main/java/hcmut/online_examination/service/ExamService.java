@@ -26,9 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import hcmut.online_examination.entity.QuestionType;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class ExamService {
     private final UserRepository userRepository;
     private final OptionRepository optionRepository;
     private final ExamResultRepository examResultRepository;
+    private final JudgeService judgeService;
 
     @Transactional
     public ExamEntity setPasscode(String examCode, String passcode) {
@@ -142,14 +145,29 @@ public class ExamService {
                 throw new IllegalArgumentException("Invalid question: " + answer.questionId());
             }
 
-            if (answer.optionId() != null) {
-                OptionEntity selectedOption = question.getOptions().stream()
-                        .filter(o -> o.getId().equals(answer.optionId()))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid option for question " + question.getId()));
+            if (question.getType() == QuestionType.CODING) {
+                if (answer.answerCode() != null) {
+                    JudgeService.JudgeResult result = judgeService.judge(
+                            answer.answerCode(),
+                            answer.language(),
+                            question.getTestCases()
+                    );
+                    if (result.isSuccess() && result.getTotalCount() > 0) {
+                        BigDecimal ratio = BigDecimal.valueOf(result.getPassedCount())
+                                .divide(BigDecimal.valueOf(result.getTotalCount()), 2, RoundingMode.HALF_UP);
+                        score = score.add(question.getScore().multiply(ratio));
+                    }
+                }
+            } else {
+                if (answer.optionId() != null) {
+                    OptionEntity selectedOption = question.getOptions().stream()
+                            .filter(o -> o.getId().equals(answer.optionId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid option for question " + question.getId()));
 
-                if (selectedOption.getIsCorrect()) {
-                    score = score.add(question.getScore());
+                    if (selectedOption.getIsCorrect()) {
+                        score = score.add(question.getScore());
+                    }
                 }
             }
             totalScore = totalScore.add(question.getScore());

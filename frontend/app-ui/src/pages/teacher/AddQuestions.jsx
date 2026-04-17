@@ -8,10 +8,13 @@ import {
   ChevronRight, 
   Image as ImageIcon,
   Type,
-  List as ListIcon
+  List as ListIcon,
+  Code,
+  FileCode
 } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "../../services/api";
+import CodeEditor from "../../components/CodeEditor";
 
 const AddQuestions = () => {
   const navigate = useNavigate();
@@ -27,6 +30,10 @@ const AddQuestions = () => {
       options: [
         { content: "", isCorrect: true },
         { content: "", isCorrect: false }
+      ],
+      starterCode: "",
+      testCases: [
+        { input: "", expectedOutput: "", isHidden: false }
       ]
     }
   ]);
@@ -43,6 +50,10 @@ const AddQuestions = () => {
           { content: "", isCorrect: false },
           { content: "", isCorrect: false },
           { content: "", isCorrect: false }
+        ],
+        starterCode: "",
+        testCases: [
+          { input: "", expectedOutput: "", isHidden: false }
         ]
       }
     ]);
@@ -77,6 +88,26 @@ const AddQuestions = () => {
     setQuestions(questions.map(q => {
       if (q.id === qId) {
         return { ...q, options: [...q.options, { content: "", isCorrect: false }] };
+      }
+      return q;
+    }));
+  };
+
+  const addTestCase = (qId) => {
+    setQuestions(questions.map(q => {
+      if (q.id === qId) {
+        return { ...q, testCases: [...q.testCases, { input: "", expectedOutput: "", isHidden: false }] };
+      }
+      return q;
+    }));
+  };
+
+  const updateTestCase = (qId, tIdx, field, value) => {
+    setQuestions(questions.map(q => {
+      if (q.id === qId) {
+        const newTestCases = [...q.testCases];
+        newTestCases[tIdx] = { ...newTestCases[tIdx], [field]: value };
+        return { ...q, testCases: newTestCases };
       }
       return q;
     }));
@@ -189,6 +220,12 @@ const AddQuestions = () => {
                     >
                       Chọn nhiều
                     </button>
+                    <button 
+                      className={`px-3 py-1 rounded-md text-[10px] font-bold border ${q.type === 'CODING' ? 'bg-[#006070] text-white border-[#006070]' : 'bg-white text-slate-400 border-slate-200'}`}
+                      onClick={() => updateQuestion(q.id, 'type', 'CODING')}
+                    >
+                      Lập trình
+                    </button>
                   </div>
                 </div>
                 <button 
@@ -213,43 +250,125 @@ const AddQuestions = () => {
                 </div>
               </div>
 
-              <div className="space-y-3 pl-8 relative">
-                 <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-slate-100"></div>
-                 {q.options.map((opt, oIdx) => (
-                   <div key={oIdx} className="option-input-group">
-                     <div 
-                      className={`correct-indicator ${opt.isCorrect ? 'active' : ''}`}
-                      onClick={() => updateOption(q.id, oIdx, "isCorrect", !opt.isCorrect)}
-                     >
-                       {opt.isCorrect && <Check size={12} />}
-                     </div>
-                     <input 
-                      type="text" 
-                      className="flex-1 p-2.5 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-[#006070]"
-                      placeholder={`Lựa chọn ${String.fromCharCode(65 + oIdx)}...`}
-                      value={opt.content}
-                      onChange={(e) => updateOption(q.id, oIdx, "content", e.target.value)}
-                     />
-                     {q.options.length > 2 && (
-                       <button 
-                        className="text-slate-300 hover:text-red-400 bg-transparent border-none cursor-pointer"
-                        onClick={() => {
-                          const newOpts = q.options.filter((_, i) => i !== oIdx);
-                          updateQuestion(q.id, "options", newOpts);
-                        }}
+              {q.type !== 'CODING' ? (
+                <div className="space-y-3 pl-8 relative">
+                   <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-slate-100"></div>
+                   {q.options.map((opt, oIdx) => (
+                     <div key={oIdx} className="option-input-group">
+                       <div 
+                        className={`correct-indicator ${opt.isCorrect ? 'active' : ''}`}
+                        onClick={() => updateOption(q.id, oIdx, "isCorrect", !opt.isCorrect)}
                        >
-                         <Trash2 size={14} />
-                       </button>
-                     )}
-                   </div>
-                 ))}
-                 <button 
-                  className="flex items-center gap-2 text-xs font-bold text-[#006070] bg-transparent border-none cursor-pointer mt-4 hover:underline"
-                  onClick={() => addOption(q.id)}
-                 >
-                   <Plus size={14} /> Thêm lựa chọn
-                 </button>
-              </div>
+                         {opt.isCorrect && <Check size={12} />}
+                       </div>
+                       <input 
+                        type="text" 
+                        className="flex-1 p-2.5 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-[#006070]"
+                        placeholder={`Lựa chọn ${String.fromCharCode(65 + oIdx)}...`}
+                        value={opt.content}
+                        onChange={(e) => updateOption(q.id, oIdx, "content", e.target.value)}
+                       />
+                       {q.options.length > 2 && (
+                         <button 
+                          className="text-slate-300 hover:text-red-400 bg-transparent border-none cursor-pointer"
+                          onClick={() => {
+                            const newOpts = q.options.filter((_, i) => i !== oIdx);
+                            updateQuestion(q.id, "options", newOpts);
+                          }}
+                         >
+                           <Trash2 size={14} />
+                         </button>
+                       )}
+                     </div>
+                   ))}
+                   <button 
+                    className="flex items-center gap-2 text-xs font-bold text-[#006070] bg-transparent border-none cursor-pointer mt-4 hover:underline"
+                    onClick={() => addOption(q.id)}
+                   >
+                     <Plus size={14} /> Thêm lựa chọn
+                   </button>
+                </div>
+              ) : (
+                <div className="space-y-6 pl-8 relative">
+                  <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-slate-100"></div>
+                  
+                  {/* Starter Code */}
+                  <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                    <div className="flex items-center gap-2 mb-3">
+                       <FileCode size={16} className="text-slate-400" />
+                       <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Mã nguồn khởi đầu</span>
+                    </div>
+                    <CodeEditor 
+                        value={q.starterCode}
+                        onChange={(code) => updateQuestion(q.id, "starterCode", code)}
+                        placeholder="// Nhập code khởi đầu cho thí sinh... (ví dụ: public class Main { ... })"
+                    />
+                  </div>
+
+                  {/* Test Cases */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                       <div className="flex items-center gap-2">
+                         <Code size={16} className="text-slate-400" />
+                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Test Cases</span>
+                       </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {q.testCases.map((tc, tIdx) => (
+                        <div key={tIdx} className="p-4 bg-white border border-slate-200 rounded-xl relative">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase">Input</p>
+                              <textarea 
+                                className="w-full p-2 bg-[#f8fafc] border border-slate-100 rounded text-xs outline-none focus:border-[#006070] min-h-[60px]"
+                                value={tc.input}
+                                onChange={(e) => updateTestCase(q.id, tIdx, "input", e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase">Output mong muốn</p>
+                              <textarea 
+                                className="w-full p-2 bg-[#f8fafc] border border-slate-100 rounded text-xs outline-none focus:border-[#006070] min-h-[60px]"
+                                value={tc.expectedOutput}
+                                onChange={(e) => updateTestCase(q.id, tIdx, "expectedOutput", e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 mt-3">
+                             <label className="flex items-center gap-2 cursor-pointer">
+                               <input 
+                                 type="checkbox" 
+                                 className="w-3 h-3 accent-[#006070]" 
+                                 checked={tc.isHidden}
+                                 onChange={(e) => updateTestCase(q.id, tIdx, "isHidden", e.target.checked)}
+                               />
+                               <span className="text-[10px] font-medium text-slate-500">Ẩn test case này</span>
+                             </label>
+                             {q.testCases.length > 1 && (
+                               <button 
+                                 className="ml-auto p-1.5 text-slate-300 hover:text-red-500 bg-transparent border-none cursor-pointer"
+                                 onClick={() => {
+                                   const newTCs = q.testCases.filter((_, i) => i !== tIdx);
+                                   updateQuestion(q.id, "testCases", newTCs);
+                                 }}
+                               >
+                                 <Trash2 size={14} />
+                               </button>
+                             )}
+                          </div>
+                        </div>
+                      ))}
+                      <button 
+                        className="flex items-center gap-2 text-xs font-bold text-[#006070] bg-transparent border-none cursor-pointer mt-2 hover:underline"
+                        onClick={() => addTestCase(q.id)}
+                      >
+                        <Plus size={14} /> Thêm test case
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
 
