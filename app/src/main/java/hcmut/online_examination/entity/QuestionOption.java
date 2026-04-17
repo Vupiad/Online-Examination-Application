@@ -23,5 +23,5 @@ public class QuestionOption {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     @JsonIgnore
-    private Question question;
+    private QuestionEntity question;
 }

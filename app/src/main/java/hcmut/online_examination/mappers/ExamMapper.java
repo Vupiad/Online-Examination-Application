@@ -58,7 +58,7 @@ public class ExamMapper {
 
         return new QuestionDto(
                 entity.getId(),
-                entity.getQuestion(),
+                entity.getContent(),
                 entity.getScore(),
                 entity.getOptions().stream()
                         .map(o -> toOptionDto(o, getCorrectAnswer))
@@ -101,7 +101,7 @@ public class ExamMapper {
         if (dto == null) return null;
 
         return QuestionEntity.builder()
-                .question(dto.question())
+                .content(dto.content())
                 .score(dto.score())
                 .build();
     }

@@ -1,11 +1,25 @@
 package hcmut.online_examination.controller;
 
-import hcmut.online_examination.dto.DashboardStats;
-import hcmut.online_examination.entity.Exam;
+import hcmut.online_examination.dto.CreateExamRequest;
+import hcmut.online_examination.dto.ExamDto;
+import hcmut.online_examination.dto.ExamResultDto;
+import hcmut.online_examination.dto.JoinExamRequest;
+import hcmut.online_examination.dto.SubmitExamRequest;
+import hcmut.online_examination.dto.UpdateExamPasscodeRequest;
+import hcmut.online_examination.dto.GetExamCorrectAnswersRequest;
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
+import hcmut.online_examination.mappers.ExamMapper; 
+import hcmut.online_examination.entity.ExamEntity;
+import hcmut.online_examination.entity.ExamResultEntity;
 import hcmut.online_examination.service.ExamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
