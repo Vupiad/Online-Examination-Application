@@ -45,7 +45,6 @@ public class ExamMapper {
             return null;
 
         return new ExamResultDto(
-                entity.getExam() != null ? entity.getExam().getExamCode() : null,
                 entity.getExam() != null ? entity.getExam().getName() : null,
                 entity.getExam() != null ? entity.getExam().getExamCode() : null,
                 toUserDto(entity.getExaminee()),
