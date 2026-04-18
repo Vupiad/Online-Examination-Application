@@ -35,9 +35,9 @@ const Login = () => {
         JSON.parse(localStorage.getItem("user"));
 
       if (user && user.role === "TEACHER") {
-        navigate("/teacher/create-test"); 
+        navigate("/teacher/dashboard");
       } else {
-        navigate("/take-test"); 
+        navigate("/dashboard");
       }
     } catch (err) {
       setError(err?.message || "Login failed. Please check your credentials.");
