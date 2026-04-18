@@ -1,18 +1,52 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Key, Lock, ShieldCheck, Headset } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Key, Lock, ShieldCheck, Headset, Loader2 } from "lucide-react";
+import api from "../../services/api";
 
 const TakeTest = () => {
+  const navigate = useNavigate();
   const [testCode, setTestCode] = useState("");
   const [passcode, setPasscode] = useState("");
 
-  const handleSubmit = (e) => {
+  // Các state quản lý trạng thái gọi API
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Bắt đầu tham gia bài thi:", { testCode, passcode });
+    setLoading(true);
+    setError("");
+
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const userId = currentUser?.id || 1;
+
+      const payload = {
+        examCode: testCode,
+        userId: userId,
+        passcode: passcode,
+      };
+
+      // join exam
+      const response = await api.post("/api/exam/join", payload);
+
+      console.log("Bắt đầu tham gia bài thi thành công:", response.data);
+
+      navigate(`/exam/${testCode}`, { state: { examData: response.data } });
+    } catch (err) {
+      // Xử lý lỗi trả về từ Backend (Sai passcode, hết lượt, mã bài thi không tồn tại...)
+      const errorMessage =
+        err.response?.data?.message ||
+        "Không thể tham gia bài thi. Vui lòng kiểm tra lại mã bài thi và mật khẩu.";
+      setError(errorMessage);
+      console.error("Lỗi khi join exam:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 md:p-12 min-h-full">
+    <div className="flex flex-col items-center justify-center p-6 md:p-12 min-h-full animate-[fadeIn_0.4s_ease-out]">
       {/* Progress Bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-[#dbe4e9]">
         <div className="w-1/4 h-full bg-[#026880] transition-all duration-500"></div>
@@ -20,9 +54,9 @@ const TakeTest = () => {
 
       {/* Central Card */}
       <div className="w-full max-w-2xl z-10 mt-8 md:mt-12">
-        <div className="bg-[#ffffff] rounded-xl p-8 md:p-14 shadow-sm transition-all duration-300">
+        <div className="bg-[#ffffff] rounded-xl p-8 md:p-14 shadow-sm border border-gray-100 transition-all duration-300">
           <div className="mb-12 text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-['Be_Vietnam_Pro'] font-bold text-[#2b3437] tracking-tight mb-4 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2b3437] tracking-tight mb-4 leading-tight">
               Take a New Test
             </h2>
             <p className="text-[#576065] max-w-lg leading-relaxed">
@@ -30,6 +64,13 @@ const TakeTest = () => {
               instructor to start the assessment.
             </p>
           </div>
+
+          {/* Vùng hiển thị lỗi nếu nhập sai mã/passcode */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8 text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 gap-8">
@@ -79,9 +120,17 @@ const TakeTest = () => {
             <div className="pt-6 flex flex-col md:flex-row items-center gap-6">
               <button
                 type="submit"
-                className="w-full md:w-auto px-10 py-4 bg-[#026880] hover:bg-[#005b70] text-[#f1faff] rounded-xl font-bold shadow-lg shadow-[#026880]/10 transition-all active:scale-[0.98]"
+                disabled={loading}
+                className="w-full md:w-auto px-10 py-4 flex items-center justify-center gap-2 bg-[#026880] hover:bg-[#005b70] disabled:bg-[#026880]/70 text-[#f1faff] rounded-xl font-bold shadow-lg shadow-[#026880]/10 transition-all active:scale-[0.98] disabled:active:scale-100"
               >
-                Start Test
+                {loading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  "Start Test"
+                )}
               </button>
             </div>
           </form>
@@ -116,8 +165,8 @@ const TakeTest = () => {
       </div>
 
       {/* Background Decoration */}
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#94dffb]/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
-      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-[#cee7ec]/30 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+      <div className="fixed top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#94dffb]/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-[#cee7ec]/30 rounded-full blur-[80px] pointer-events-none -z-10"></div>
     </div>
   );
 };
