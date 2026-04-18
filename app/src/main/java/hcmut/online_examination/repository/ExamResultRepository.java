@@ -14,4 +14,5 @@ public interface ExamResultRepository extends JpaRepository<ExamResultEntity, Lo
     long countByExamAndExaminee(ExamEntity exam, User examinee);
 
     List<ExamResultEntity> findAllByExam(ExamEntity exam);
+    List<ExamResultEntity> findAllByExamineeOrderBySubmittedAtDesc(User examinee);
 }

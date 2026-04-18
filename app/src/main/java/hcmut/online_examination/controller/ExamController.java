@@ -5,6 +5,7 @@ import hcmut.online_examination.dto.ExamDto;
 import hcmut.online_examination.dto.ExamResultDto;
 import hcmut.online_examination.dto.JoinExamRequest;
 import hcmut.online_examination.dto.SubmitExamRequest;
+import hcmut.online_examination.dto.TeacherExamOverviewDto;
 import hcmut.online_examination.dto.UpdateExamPasscodeRequest;
 import hcmut.online_examination.dto.GetExamCorrectAnswersRequest;
 import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
@@ -110,5 +111,18 @@ public class ExamController {
                 request.examCode(),
                 request.requestUserId()
         );
+    }
+
+    @GetMapping("/history")
+    public List<ExamResultDto> getExamHistory(@RequestParam Long userId) {
+        return examService.getExamHistoryByUser(userId)
+                .stream()
+                .map(ExamMapper::toExamResultDto) 
+                .toList();
+    }
+
+    @GetMapping("/teacher/list")
+    public List<TeacherExamOverviewDto> getExamsByTeacher(@RequestParam Long teacherId) {
+        return examService.getExamsCreatedByTeacher(teacherId);
     }
 }

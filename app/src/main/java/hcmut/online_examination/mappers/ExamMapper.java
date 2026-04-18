@@ -5,6 +5,7 @@ import hcmut.online_examination.dto.ExamResultDto;
 import hcmut.online_examination.dto.ExamineeAnswerDto;
 import hcmut.online_examination.dto.OptionDto;
 import hcmut.online_examination.dto.QuestionDto;
+import hcmut.online_examination.dto.TeacherExamOverviewDto;
 import hcmut.online_examination.dto.UserDto;
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
@@ -13,6 +14,7 @@ import hcmut.online_examination.entity.OptionEntity;
 import hcmut.online_examination.entity.QuestionEntity;
 import hcmut.online_examination.entity.User;
 
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 public class ExamMapper {
@@ -41,8 +43,10 @@ public class ExamMapper {
         if (entity == null) return null;
 
         return new ExamResultDto(
+                entity.getExam() != null ? entity.getExam().getExamCode() : null,
                 entity.getExam() != null ? entity.getExam().getName() : null,
                 toUserDto(entity.getExaminee()),
+                entity.getExam() != null ? entity.getExam().getDurationInMinutes() : null,
                 entity.getTimeTaken(),
                 entity.getScore(),
                 entity.getTotalScore(),
@@ -113,5 +117,32 @@ public class ExamMapper {
                 .content(dto.content())
                 .isCorrect(dto.isCorrect())
                 .build();
+    }
+
+    public static TeacherExamOverviewDto toTeacherExamOverviewDto(ExamEntity entity) {
+        if (entity == null) return null;
+
+        // 🔥 Logic tính toán Status dựa trên thời gian
+        String currentStatus = "DRAFT";
+        Instant now = Instant.now();
+
+        if (entity.getStartTime() != null && entity.getEndTime() != null) {
+            if (now.isBefore(entity.getStartTime())) {
+                currentStatus = "UPCOMING"; 
+            } else if (now.isAfter(entity.getEndTime())) {
+                currentStatus = "CLOSED";   
+            } else {
+                currentStatus = "OPEN";    
+            }
+        }
+
+        return new TeacherExamOverviewDto(
+                entity.getExamCode(),
+                entity.getName(),
+                entity.getDurationInMinutes(),
+                entity.getStartTime(),
+                entity.getEndTime(),
+                currentStatus
+        );
     }
 }

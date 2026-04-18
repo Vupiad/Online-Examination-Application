@@ -3,7 +3,8 @@ package hcmut.online_examination.service;
 import hcmut.online_examination.dto.QuestionAnswerDto;
 import hcmut.online_examination.dto.QuestionDto;
 import hcmut.online_examination.dto.OptionDto;
-import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto; 
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
+import hcmut.online_examination.dto.TeacherExamOverviewDto;
 import hcmut.online_examination.mappers.ExamMapper; 
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
@@ -212,5 +213,21 @@ public class ExamService {
 
             return new QuestionWithCorrectAnswersDto(question.getId(), correctOptionId);
         }).collect(Collectors.toList());
+    }
+
+    public List<ExamResultEntity> getExamHistoryByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        return examResultRepository.findAllByExamineeOrderBySubmittedAtDesc(user);
+    }
+
+    public List<TeacherExamOverviewDto> getExamsCreatedByTeacher(Long teacherId) {
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(UserNotFoundException::new);
+
+        return examRepository.findAllByOwnerOrderByStartTimeDesc(teacher).stream()
+                .map(ExamMapper::toTeacherExamOverviewDto)
+                .collect(Collectors.toList());
     }
 }
