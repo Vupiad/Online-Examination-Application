@@ -5,7 +5,7 @@ import java.util.List;
 
 public record QuestionDto(
         Long questionId,
-        String question,
+        String content,
         BigDecimal score,
         List<OptionDto> options
 ) {
