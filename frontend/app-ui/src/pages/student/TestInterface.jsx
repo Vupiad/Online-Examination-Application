@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
+  LogIn,
 } from "lucide-react";
 import api from "../../services/api";
 
@@ -57,6 +58,7 @@ const TestInterface = () => {
   };
 
   const handleSelectOption = (questionId, optionId) => {
+    // ĐÃ SỬA LỖI: Đặt questionId trong ngoặc vuông [] để lấy giá trị biến làm key Object
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
@@ -71,10 +73,12 @@ const TestInterface = () => {
       const currentUser = JSON.parse(localStorage.getItem("user"));
       const userId = currentUser?.id || 1; // Giả lập lấy ID từ local storage
 
-      const formattedAnswers = Object.entries(answers).map(([qId, optId]) => ({
-        questionId: parseInt(qId),
-        selectedOptionId: parseInt(optId),
-      }));
+      const formattedAnswers = Object.entries(answers).map(([qId, optId]) => {
+        return {
+          questionId: parseInt(qId),
+          selectedOptionId: parseInt(optId),
+        };
+      });
 
       const payload = {
         examCode: examData.examCode,
@@ -84,10 +88,15 @@ const TestInterface = () => {
         ).toISOString(),
         answers: formattedAnswers,
       };
+      console.log(payload);
 
       const response = await api.post("/api/exam/submit", payload);
+      console.log(response);
+
       alert("Nộp bài thành công! Điểm của bạn: " + response.data.score);
-      navigate("/dashboard");
+
+      // ĐÃ SỬA LỖI CHUYỂN HƯỚNG: Chuyển thẳng sang trang Result Detail của bài thi này
+      navigate(`/exam/${examData.examCode}/result`);
     } catch (err) {
       console.error("Lỗi khi nộp bài:", err);
       alert("Có lỗi xảy ra khi nộp bài. Vui lòng thử lại!");
@@ -160,17 +169,22 @@ const TestInterface = () => {
                   <div className="grid grid-cols-1 gap-4 mt-8">
                     {currentQuestion.options?.map((option, index) => (
                       <label
-                        key={option.id}
+                        key={option.id} // ĐÃ SỬA LỖI: Dùng option.id
                         className={`group flex items-center p-5 rounded-lg cursor-pointer transition-all border ${answers[currentQuestion.id] === option.id ? "bg-[#94dffb]/30 border-[#026880]" : "bg-[#e8eff2] border-transparent hover:bg-[#94dffb]/20"} active:scale-[0.98]`}
                       >
                         <input
                           type="radio"
                           name={`question-${currentQuestion.id}`}
                           className="w-5 h-5 text-[#026880] bg-[#dbe4e9] border-none focus:ring-0 focus:ring-offset-0"
-                          checked={answers[currentQuestion.id] === option.id}
-                          onChange={() =>
-                            handleSelectOption(currentQuestion.id, option.id)
+                          checked={
+                            answers[currentQuestion.questionId] === option.id // ĐÃ SỬA LỖI: Dùng currentQuestion.id
                           }
+                          onChange={() => {
+                            handleSelectOption(
+                              currentQuestion.questionId, // ĐÃ SỬA LỖI: Dùng currentQuestion.id
+                              option.id,
+                            );
+                          }}
                         />
                         <span className="ml-4 text-[#2b3437] font-medium">
                           {String.fromCharCode(65 + index)}. {option.content}

@@ -10,7 +10,7 @@ import {
   ChevronDown,
   XCircle,
 } from "lucide-react";
-import { fetchExamResultsByCode } from "../../services/api";
+import { fetchExamResultsByCode, fetchExamInfo } from "../../services/api";
 
 const DEFAULT_SORT = { key: "studentName", direction: "asc" };
 
@@ -19,6 +19,7 @@ const ExamResults = () => {
   const navigate = useNavigate();
 
   const [rawResults, setRawResults] = useState([]);
+  const [examInfo, setExamInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,15 +27,20 @@ const ExamResults = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
-    const fetchResults = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const results = await fetchExamResultsByCode(examCode);
+        const [results, info] = await Promise.all([
+          fetchExamResultsByCode(examCode),
+          fetchExamInfo(examCode).catch(() => null)
+        ]);
+
         setRawResults(results);
+        setExamInfo(info);
       } catch (err) {
-        console.error("Error fetching teacher exam results:", err);
+        console.error("Error fetching teacher exam data:", err);
         setError("Không thể tải danh sách kết quả. Vui lòng thử lại sau.");
       } finally {
         setLoading(false);
@@ -42,7 +48,7 @@ const ExamResults = () => {
     };
 
     if (examCode) {
-      fetchResults();
+      fetchData();
     }
   }, [examCode]);
 
@@ -237,7 +243,7 @@ const ExamResults = () => {
               Teacher Results Overview
             </p>
             <h1 className="text-xl md:text-2xl font-['Be_Vietnam_Pro'] font-bold text-[#026880]">
-              Exam: {examCode}
+              {examInfo?.name || `Exam: ${examCode}`}
             </h1>
           </div>
         </div>

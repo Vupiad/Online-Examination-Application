@@ -33,13 +33,6 @@ const Sidebar = () => {
           <FileText className="mr-3" size={20} />
           Take a New Test
         </Link>
-        <Link
-          to="/settings"
-          className={`flex items-center py-3 px-6 transition-transform scale-95 active:scale-100 font-['Be_Vietnam_Pro'] text-sm rounded-r-full ${isActive("/settings") ? "bg-[#94dffb] text-[#026880] font-semibold" : "text-[#3f5659] hover:bg-[#dbe4e9] font-medium"}`}
-        >
-          <Settings className="mr-3" size={20} />
-          Settings
-        </Link>
       </nav>
 
       {/* Sidebar Footer */}
