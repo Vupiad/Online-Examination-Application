@@ -3,13 +3,13 @@ package hcmut.online_examination.service;
 import hcmut.online_examination.dto.QuestionAnswerDto;
 import hcmut.online_examination.dto.QuestionDto;
 import hcmut.online_examination.dto.OptionDto;
-import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto; 
-import hcmut.online_examination.mappers.ExamMapper; 
+import hcmut.online_examination.dto.QuestionWithCorrectAnswersDto;
+import hcmut.online_examination.mappers.ExamMapper;
 import hcmut.online_examination.entity.ExamEntity;
 import hcmut.online_examination.entity.ExamResultEntity;
 import hcmut.online_examination.entity.OptionEntity;
 import hcmut.online_examination.entity.QuestionEntity;
-import hcmut.online_examination.entity.User; 
+import hcmut.online_examination.entity.User;
 import hcmut.online_examination.exception.DuplicateExamCodeException;
 import hcmut.online_examination.exception.ExamNotFoundException;
 import hcmut.online_examination.exception.ForbiddenException;
@@ -52,15 +52,14 @@ public class ExamService {
 
     @Transactional
     public ExamEntity createExam(
-            Long ownerId, 
+            Long ownerId,
             String examCode,
             String name,
             Long durationInMinutes,
             Integer maxAttempts,
             List<QuestionDto> questions,
             Instant startTime,
-            Instant endTime
-    ) {
+            Instant endTime) {
         User user = userRepository.findById(ownerId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -91,7 +90,7 @@ public class ExamService {
         return examRepository.save(exam);
     }
 
-    public ExamEntity joinExam(String examCode, Long userId, String passcode) { 
+    public ExamEntity joinExam(String examCode, Long userId, String passcode) {
         ExamEntity exam = examRepository.findFullExam(examCode)
                 .orElseThrow(ExamNotFoundException::new);
 
@@ -115,8 +114,7 @@ public class ExamService {
             String examCode,
             Long examineeId,
             Instant startTime,
-            List<QuestionAnswerDto> answers
-    ) {
+            List<QuestionAnswerDto> answers) {
         User examinee = userRepository.findById(examineeId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -144,7 +142,8 @@ public class ExamService {
                 OptionEntity selectedOption = question.getOptions().stream()
                         .filter(o -> o.getId().equals(answer.optionId()))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid option for question " + question.getId()));
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Invalid option for question " + question.getId()));
 
                 if (selectedOption.getIsCorrect()) {
                     score = score.add(question.getScore());
@@ -164,7 +163,7 @@ public class ExamService {
         return examResultRepository.save(attempt);
     }
 
-    public long countAttempts(String examCode, Long userId) { 
+    public long countAttempts(String examCode, Long userId) {
         ExamEntity exam = examRepository.findByExamCode(examCode)
                 .orElseThrow(ExamNotFoundException::new);
 
@@ -188,7 +187,8 @@ public class ExamService {
         ExamEntity exam = examRepository.findFullExam(examCode)
                 .orElseThrow(ExamNotFoundException::new);
 
-        // Filter the exam results list to return only those belonging to the specific User
+        // Filter the exam results list to return only those belonging to the specific
+        // User
         return examResultRepository.findAllByExam(exam).stream()
                 .filter(result -> result.getExaminee().getId().equals(user.getId()))
                 .collect(Collectors.toList());
@@ -212,5 +212,16 @@ public class ExamService {
 
             return new QuestionWithCorrectAnswersDto(question.getId(), correctOptionId);
         }).collect(Collectors.toList());
+    }
+
+    public List<ExamEntity> findExamsByOwner(Long ownerId) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(UserNotFoundException::new);
+        return examRepository.findAllByOwner(owner);
+    }
+
+    public ExamEntity getExamByCode(String examCode) {
+        return examRepository.findByExamCode(examCode)
+                .orElseThrow(ExamNotFoundException::new);
     }
 }

@@ -26,7 +26,8 @@ public class AuthService {
     public RegisterResponse register(RegisterRequest request) {
         String username = request.username();
         if (userRepository.existsByUsername(username)) {
-            // Reusing DuplicateEmailException for simplicity or we can add DuplicateUsernameException later
+            // Reusing DuplicateEmailException for simplicity or we can add
+            // DuplicateUsernameException later
             throw new DuplicateEmailException("Username is already taken");
         }
 
@@ -37,7 +38,8 @@ public class AuthService {
         user.setRole(request.role());
         User savedUser = userRepository.save(user);
 
-        return new RegisterResponse("Registration successful.", savedUser.getUsername(), savedUser.getFullName(), savedUser.getRole());
+        return new RegisterResponse(savedUser.getId(), "Registration successful.", savedUser.getUsername(), savedUser.getFullName(),
+                savedUser.getRole());
     }
 
     @Transactional(readOnly = true)
@@ -49,6 +51,6 @@ public class AuthService {
             throw new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
         }
 
-        return new AuthResponse("Login successful", user.getUsername(), user.getFullName(), user.getRole());
+        return new AuthResponse(user.getId(), "Login successful", user.getUsername(), user.getFullName(), user.getRole());
     }
 }

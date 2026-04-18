@@ -22,39 +22,42 @@ public class ExamMapper {
     }
 
     public static ExamDto toExamDto(ExamEntity entity, boolean getCorrectAnswer) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new ExamDto(
                 (Long) entity.getId(),
                 entity.getExamCode(),
-                entity.getName(), 
-                entity.getStartTime(),
+                entity.getName(),
                 entity.getEndTime(),
+                entity.getStartTime(),
                 entity.getDurationInMinutes(),
+                entity.getUpdatedAt(),
                 entity.getQuestions().stream()
                         .map(q -> toQuestionDto(q, getCorrectAnswer))
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()));
     }
 
     public static ExamResultDto toExamResultDto(ExamResultEntity entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new ExamResultDto(
                 entity.getExam() != null ? entity.getExam().getName() : null,
+                entity.getExam() != null ? entity.getExam().getExamCode() : null,
                 toUserDto(entity.getExaminee()),
                 entity.getTimeTaken(),
                 entity.getScore(),
                 entity.getTotalScore(),
                 entity.getSubmittedAt(),
                 entity.getAnswers().stream()
-                        .map(a -> toExamineeAnswerDto(a, true)) 
-                        .collect(Collectors.toList())
-        );
+                        .map(a -> toExamineeAnswerDto(a, true))
+                        .collect(Collectors.toList()));
     }
 
     public static QuestionDto toQuestionDto(QuestionEntity entity, boolean getCorrectAnswer) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new QuestionDto(
                 entity.getId(),
@@ -62,43 +65,43 @@ public class ExamMapper {
                 entity.getScore(),
                 entity.getOptions().stream()
                         .map(o -> toOptionDto(o, getCorrectAnswer))
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()));
     }
 
     public static OptionDto toOptionDto(OptionEntity entity, boolean getCorrectAnswer) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new OptionDto(
                 entity.getId(),
                 entity.getContent(),
-                getCorrectAnswer ? entity.getIsCorrect() : false 
-        );
+                getCorrectAnswer ? entity.getIsCorrect() : false);
     }
 
     public static ExamineeAnswerDto toExamineeAnswerDto(ExamineeAnswerEntity entity, boolean getCorrectAnswer) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new ExamineeAnswerDto(
                 toQuestionDto(entity.getQuestion(), getCorrectAnswer),
                 entity.getOption() != null ? entity.getOption().getId() : null,
-                entity.getIsCorrect()
-        );
+                entity.getIsCorrect());
     }
 
     public static UserDto toUserDto(User entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
 
         return new UserDto(
                 (Long) entity.getId(),
-                null, 
+                null,
                 entity.getUsername(),
-                false
-        );
+                false);
     }
 
     public static QuestionEntity toQuestionEntity(QuestionDto dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
 
         return QuestionEntity.builder()
                 .content(dto.content())
@@ -107,7 +110,8 @@ public class ExamMapper {
     }
 
     public static OptionEntity toOptionEntity(OptionDto dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
 
         return OptionEntity.builder()
                 .content(dto.content())

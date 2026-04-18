@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,22 +23,26 @@ public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
 
     Optional<ExamEntity> findByExamCodeAndOwner(String examCode, User user);
 
+    List<ExamEntity> findAllByOwner(User owner);
+
     // @Query("""
     // SELECT e FROM ExamEntity e
     // JOIN FETCH e.questions q
     // JOIN FETCH q.answers
     // WHERE e.examCode = :examCode
     // """)
-    // Optional<ExamEntity> findFullExamByExamCode(@Param("examCode") String examCode);
+    // Optional<ExamEntity> findFullExamByExamCode(@Param("examCode") String
+    // examCode);
 
     // @Query("""
-    //     SELECT e FROM ExamEntity e
-    //     JOIN FETCH e.questions
-    //     WHERE e.examCode = :examCode
+    // SELECT e FROM ExamEntity e
+    // JOIN FETCH e.questions
+    // WHERE e.examCode = :examCode
     // """)
-    // Optional<ExamEntity> findFullExamWithQuestions(@Param("examCode") String examCode);
+    // Optional<ExamEntity> findFullExamWithQuestions(@Param("examCode") String
+    // examCode);
 
-    @EntityGraph(attributePaths = {"questions", "questions.options"})
+    @EntityGraph(attributePaths = { "questions", "questions.options" })
     @Query("SELECT e FROM ExamEntity e WHERE e.examCode = :examCode")
     Optional<ExamEntity> findFullExam(@Param("examCode") String examCode);
 }

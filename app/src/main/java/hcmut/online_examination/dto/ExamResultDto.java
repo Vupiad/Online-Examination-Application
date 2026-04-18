@@ -5,7 +5,8 @@ import java.time.Instant;
 import java.util.List;
 
 public record ExamResultDto(
-        String examName,      
+        String examName,
+        String examCode,
         UserDto examinee, 
         Long timeTaken,       
         BigDecimal score,
