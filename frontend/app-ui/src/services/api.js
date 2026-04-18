@@ -43,4 +43,9 @@ export const fetchExamResultsByUser = async (examCode, userId) => {
   return Array.isArray(response.data) ? response.data : [];
 };
 
+export const fetchExamInfo = async (examCode) => {
+  const response = await api.get(`/api/exam/info/${examCode}`);
+  return response.data;
+};
+
 export default api;
