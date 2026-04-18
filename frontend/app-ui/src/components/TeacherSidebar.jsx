@@ -7,6 +7,7 @@ import {
   Plus,
   LogOut,
   User,
+  Library,
 } from "lucide-react";
 
 const TeacherSidebar = () => {
@@ -75,6 +76,13 @@ const TeacherSidebar = () => {
         >
           <Settings size={20} />
           <span>Class List</span>
+        </Link>
+        <Link
+          to="/teacher/question-bank"
+          className={`flex items-center gap-3 px-4 py-3 transition-all duration-300 rounded-lg font-medium ${isActive("/teacher/question-bank") ? "bg-[#dbe4e9] text-[#026880] shadow-sm" : "text-[#3f5659] hover:bg-[#dbe4e9]/50"}`}
+        >
+          <Library size={20} />
+          <span>Question Bank</span>
         </Link>
       </nav>
 

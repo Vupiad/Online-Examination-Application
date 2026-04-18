@@ -7,5 +7,6 @@ public record SubmitExamRequest(
         String examCode,
         Instant startTime, 
         Long examineeId,
-        List<QuestionAnswerDto> answers
+        List<QuestionAnswerDto> answers,
+        Integer violationCount
 ) {}

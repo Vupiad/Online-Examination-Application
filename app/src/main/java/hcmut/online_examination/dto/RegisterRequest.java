@@ -1,6 +1,7 @@
 package hcmut.online_examination.dto;
 
 import hcmut.online_examination.entity.UserRole;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +12,12 @@ public record RegisterRequest(
 
         @NotBlank
         String fullName,
+
+        @NotBlank
+        @Email
+        String email,
+
+        String className, // Optional for teachers, required for students logic can be in service
 
         @NotBlank
         @Pattern(

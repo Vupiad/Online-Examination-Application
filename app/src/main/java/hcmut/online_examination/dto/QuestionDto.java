@@ -11,12 +11,19 @@ public record QuestionDto(
         List<OptionDto> options,
         QuestionType type,
         String starterCode,
-        List<TestCaseDto> testCases
+        String language,
+        List<TestCaseDto> testCases,
+        
+        // Essay fields
+        Integer minWords,
+        Integer maxWords,
+        String sampleAnswer,
+        String gradingRubric
 ) {
 
     public QuestionDto {
         if (score == null) {
-            score = BigDecimal.ZERO;
+            score = BigDecimal.ONE;
         }
         if (content == null) {
             content = "";
@@ -25,7 +32,10 @@ public record QuestionDto(
             options = List.of();
         }
         if (type == null) {
-            type = QuestionType.SINGLE_CHOICE;
+            type = QuestionType.MULTIPLE_CHOICE;
+        }
+        if (testCases == null) {
+            testCases = List.of();
         }
     }
 }

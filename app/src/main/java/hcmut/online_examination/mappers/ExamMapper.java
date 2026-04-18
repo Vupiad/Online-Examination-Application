@@ -31,7 +31,9 @@ public class ExamMapper {
         if (entity == null) return null;
 
         return new ExamResultDto(
+                entity.getId(),
                 entity.getExam() != null ? entity.getExam().getName() : null,
+                entity.getExam() != null ? entity.getExam().getExamCode() : null,
                 toUserDto(entity.getExaminee()),
                 entity.getTimeTaken(),
                 entity.getScore(),
@@ -39,7 +41,8 @@ public class ExamMapper {
                 entity.getSubmittedAt(),
                 entity.getAnswers().stream()
                         .map(a -> toExamineeAnswerDto(a, true))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                entity.getViolationCount()
         );
     }
 
@@ -55,9 +58,14 @@ public class ExamMapper {
                         .collect(Collectors.toList()),
                 entity.getType(),
                 entity.getStarterCode(),
+                entity.getLanguage(),
                 entity.getTestCases().stream()
                         .map(ExamMapper::toTestCaseDto)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                entity.getMinWords(),
+                entity.getMaxWords(),
+                entity.getSampleAnswer(),
+                entity.getGradingRubric()
         );
     }
 
@@ -88,6 +96,7 @@ public class ExamMapper {
         return new ExamineeAnswerDto(
                 toQuestionDto(entity.getQuestion(), getCorrectAnswer),
                 entity.getOption() != null ? entity.getOption().getId() : null,
+                entity.getContent(),
                 entity.getIsCorrect()
         );
     }
@@ -97,9 +106,12 @@ public class ExamMapper {
 
         return new UserDto(
                 entity.getId(),
-                null,
+                entity.getFullName(),
                 entity.getUsername(),
-                false
+                entity.getEmail(),
+                entity.getClassName(),
+                entity.getRole(),
+                entity.getRole() == UserRole.TEACHER
         );
     }
 
@@ -107,13 +119,18 @@ public class ExamMapper {
         if (dto == null) return null;
 
         BigDecimal score = dto.score() != null ? dto.score() : BigDecimal.ONE;
-        QuestionType type = dto.type() != null ? dto.type() : QuestionType.SINGLE_CHOICE;
+        QuestionType type = dto.type() != null ? dto.type() : QuestionType.MULTIPLE_CHOICE;
 
         QuestionEntity entity = QuestionEntity.builder()
                 .question(dto.content())
                 .score(score)
                 .type(type)
                 .starterCode(dto.starterCode())
+                .language(dto.language())
+                .minWords(dto.minWords())
+                .maxWords(dto.maxWords())
+                .sampleAnswer(dto.sampleAnswer())
+                .gradingRubric(dto.gradingRubric())
                 .build();
 
         if (dto.testCases() != null) {

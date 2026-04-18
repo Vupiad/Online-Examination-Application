@@ -13,6 +13,7 @@ import api from "../../services/api";
 import { QuestionTypeSelector } from "../../components/teacher/QuestionTypeSelector";
 import { EssayQuestion } from "../../components/teacher/EssayQuestion";
 import { CodeQuestion } from "../../components/teacher/CodeQuestion";
+import { AiScanner } from "../../components/teacher/AiScanner";
 
 const CreateTest = () => {
   const navigate = useNavigate();
@@ -105,8 +106,7 @@ const CreateTest = () => {
   // Legacy handlers for Multiple Choice (adapted)
   const handleMarkCorrectOption = (qIndex, oIndex) => {
     const updated = { ...questions[qIndex] };
-    updated.options.forEach((opt) => (opt.isCorrect = false));
-    updated.options[oIndex].isCorrect = true;
+    updated.options[oIndex].isCorrect = !updated.options[oIndex].isCorrect;
     handleUpdateQuestion(qIndex, updated);
   };
 
@@ -114,6 +114,30 @@ const CreateTest = () => {
     const updated = { ...questions[qIndex] };
     updated.options[oIndex].content = newContent;
     handleUpdateQuestion(qIndex, updated);
+  };
+
+  const handleAiQuestions = (extracted) => {
+    const newQs = extracted.map((q, idx) => ({
+      id: Date.now() + idx,
+      type: "MULTIPLE_CHOICE",
+      content: q.content,
+      score: 1.0,
+      options: q.options.map((optContent) => ({
+        id: Math.random(),
+        content: optContent,
+        isCorrect: false
+      })),
+      testCases: [],
+      starterCode: "",
+      language: "Python",
+    }));
+
+    if (questions.length === 1 && !questions[0].content) {
+      setQuestions(newQs);
+    } else {
+       setQuestions(prev => [...prev, ...newQs]);
+    }
+    alert(`AI successfully extracted ${extracted.length} questions! Please verify and mark the correct answers.`);
   };
 
   //  Xử lý API Gọi lên Backend
@@ -124,6 +148,23 @@ const CreateTest = () => {
 
   const handleSaveTest = async () => {
     if (!examData.name) return alert("Vui lòng nhập tên bài thi.");
+
+    if (examData.startTime && examData.endTime) {
+        const start = new Date(examData.startTime);
+        const end = new Date(examData.endTime);
+        const now = new Date();
+
+        if (start < now) {
+            return alert("Thời gian bắt đầu không được ở quá khứ.");
+        }
+        if (start >= end) {
+            return alert("Thời gian bắt đầu phải trước thời gian kết thúc.");
+        }
+    }
+
+    if (examData.durationInMinutes <= 0) {
+        return alert("Thời lượng bài thi phải lớn hơn 0.");
+    }
 
     for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
@@ -156,19 +197,40 @@ const CreateTest = () => {
         questions: questions.map((q) => ({
           type: q.type,
           content: q.content,
-          score: q.score,
+          score: q.score || 1,
           starterCode: q.starterCode,
-          options: q.type === "MULTIPLE_CHOICE" ? q.options.map((opt) => ({
+          language: q.language,
+          minWords: q.minWords,
+          maxWords: q.maxWords,
+          sampleAnswer: q.sampleAnswer,
+          gradingRubric: q.gradingRubric,
+          options: q.options.map((opt) => ({
             content: opt.content,
             isCorrect: opt.isCorrect,
-          })) : [],
-          testCases: q.type === "CODE" ? q.testCases : [],
+          })),
         })),
       };
 
-      const res = await api.post("/api/exam/create", payload);
-      setCreatedExamCode(res.data.examCode);
-      setShowSuccessModal(true);
+      await api.post("/api/exam/create", payload);
+
+      // Save to bank if flag is set
+      for (const q of questions) {
+        if (q.saveToBank) {
+           await api.post(`/api/question-bank/save?ownerId=${ownerId}`, {
+              content: q.content,
+              type: q.type,
+              defaultScore: q.score,
+              starterCode: q.starterCode,
+              language: q.language,
+              sampleAnswer: q.sampleAnswer,
+              gradingRubric: q.gradingRubric,
+              options: q.options.map(o => ({ content: o.content, isCorrect: o.isCorrect }))
+           });
+        }
+      }
+
+      alert("Bài thi đã được lưu thành công!");
+      navigate("/teacher/dashboard");
     } catch (err) {
       console.error("Lỗi lưu bài thi:", err);
       alert("Đã xảy ra lỗi khi tạo bài thi.");
@@ -274,7 +336,7 @@ const CreateTest = () => {
               <Settings size={20} /> Test Settings
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              <div className="md:col-span-5 space-y-2">
+              <div className="md:col-span-4 space-y-2">
                 <label className="text-xs font-bold text-[#737c80] uppercase tracking-wider ml-1">
                   Test Name
                 </label>
@@ -299,7 +361,19 @@ const CreateTest = () => {
                   className="w-full bg-[#e2e9ed] border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-[#026880] focus:bg-white transition-all outline-none"
                 />
               </div>
-              <div className="md:col-span-5 space-y-2">
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs font-bold text-[#737c80] uppercase tracking-wider ml-1">
+                  Max Attempts
+                </label>
+                <input
+                  type="number"
+                  name="maxAttempts"
+                  value={examData.maxAttempts}
+                  onChange={handleExamDataChange}
+                  className="w-full bg-[#e2e9ed] border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-[#026880] focus:bg-white transition-all outline-none"
+                />
+              </div>
+              <div className="md:col-span-4 space-y-2">
                 <label className="text-xs font-bold text-[#737c80] uppercase tracking-wider ml-1">
                   Time Window (Optional)
                 </label>
@@ -322,6 +396,11 @@ const CreateTest = () => {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* AI Scanning Feature */}
+        <section className="max-w-4xl mx-auto mb-10">
+          <AiScanner onQuestionsExtracted={handleAiQuestions} />
         </section>
 
         {/* Question Builder */}
@@ -348,7 +427,16 @@ const CreateTest = () => {
                           Multiple Choice
                         </span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
+                        <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-100 cursor-pointer hover:bg-white transition-all group/bank">
+                           <input 
+                             type="checkbox"
+                             checked={q.saveToBank || false}
+                             onChange={(e) => handleUpdateQuestion(qIndex, { ...q, saveToBank: e.target.checked })}
+                             className="w-4 h-4 text-[#026880] rounded focus:ring-[#026880]"
+                           />
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 group-hover/bank:text-[#026880]">Save to Bank</span>
+                        </label>
                         <button onClick={() => handleRemoveQuestion(q.id)} className="p-2 text-[#737c80] hover:text-red-500 transition-colors">
                           <Trash2 size={20} />
                         </button>
@@ -375,10 +463,13 @@ const CreateTest = () => {
                           <div key={opt.id} className={`flex items-center gap-3 p-4 rounded-xl transition-all border ${opt.isCorrect ? "bg-[#94dffb]/20 border-[#026880]" : "bg-[#f7fafc] border-transparent hover:bg-[#e2e9ed]"}`}>
                             <input
                               type="radio"
-                              name={`correct_opt_${q.id}`}
+                              readOnly
                               checked={opt.isCorrect}
-                              onChange={() => handleMarkCorrectOption(qIndex, oIndex)}
-                              className="w-5 h-5 text-[#026880] border-[#aab3b8] focus:ring-[#026880]"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleMarkCorrectOption(qIndex, oIndex);
+                              }}
+                              className="w-5 h-5 text-[#026880] border-[#aab3b8] bg-[#e2e9ed]/50 focus:ring-[#026880] cursor-pointer"
                             />
                             <div className="flex-1">
                               <input

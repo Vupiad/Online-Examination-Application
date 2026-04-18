@@ -4,6 +4,7 @@ import hcmut.online_examination.entity.UserRole;
 
 public record RegisterResponse(
         String message,
+        Long id,
         String username,
         String fullName,
         UserRole role

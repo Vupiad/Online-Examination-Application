@@ -1,9 +1,13 @@
 package hcmut.online_examination.dto;
 
+import hcmut.online_examination.entity.UserRole;
 
 public record UserDto(
-        Long id, 
-        String email,
+        Long id,
+        String fullName,
         String username,
-        Boolean hasVerifiedEmail
+        String email,
+        String className,
+        UserRole role,
+        boolean isTeacher
 ) {}

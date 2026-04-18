@@ -51,6 +51,10 @@ public class ExamResultEntity {
     @Builder.Default
     private Long timeTaken = 0L;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer violationCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "examinee_id", nullable = false)
     private User examinee;

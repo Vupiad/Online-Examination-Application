@@ -43,4 +43,7 @@ public class ExamineeAnswerEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_id")
     private OptionEntity option;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
 }

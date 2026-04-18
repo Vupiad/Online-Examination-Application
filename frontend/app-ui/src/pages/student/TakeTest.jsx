@@ -1,14 +1,25 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Key, Lock, ShieldCheck, Headset, Loader2 } from "lucide-react";
 import api from "../../services/api";
 
 const TakeTest = () => {
   const navigate = useNavigate();
-  const [testCode, setTestCode] = useState("");
+  const [searchParams] = useSearchParams();
+  const sharedCode = searchParams.get("code");
+  
+  const [testCode, setTestCode] = useState(sharedCode || "");
   const [passcode, setPasscode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  React.useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      const currentPath = window.location.pathname + window.location.search;
+      navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,9 +44,9 @@ const TakeTest = () => {
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
-        "Không thể tham gia bài thi. Vui lòng kiểm tra lại mã bài thi và mật khẩu.";
+        "Unable to join the exam. Please verify the test code and passcode.";
       setError(errorMessage);
-      console.error("Lỗi khi join exam:", err);
+      console.error("Error joining exam:", err);
     } finally {
       setLoading(false);
     }

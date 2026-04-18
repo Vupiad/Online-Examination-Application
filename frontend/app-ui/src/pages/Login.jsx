@@ -8,11 +8,13 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import authService from "../services/authService";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get("redirect");
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +31,12 @@ const Login = () => {
       const response = await authService.login({ username, password });
       console.log("Login success:", response);
 
-      // Redirect based on role
+      // Redirect based on role or search param
+      if (redirectPath) {
+        navigate(redirectPath);
+        return;
+      }
+
       const role = response.role;
       if (role === "TEACHER") {
         navigate("/teacher/dashboard");

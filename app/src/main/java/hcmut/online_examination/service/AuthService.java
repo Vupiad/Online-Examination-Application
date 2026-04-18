@@ -32,11 +32,13 @@ public class AuthService {
         User user = new User();
         user.setUsername(username);
         user.setFullName(request.fullName());
+        user.setEmail(request.email());
+        user.setClassName(request.className());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole(request.role());
         User savedUser = userRepository.save(user);
 
-        return new RegisterResponse("Registration successful.", savedUser.getUsername(), savedUser.getFullName(), savedUser.getRole());
+        return new RegisterResponse("Registration successful.", savedUser.getId(), savedUser.getUsername(), savedUser.getFullName(), savedUser.getRole());
     }
 
     @Transactional(readOnly = true)
@@ -48,6 +50,19 @@ public class AuthService {
             throw new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
         }
 
-        return new AuthResponse("Login successful", user.getUsername(), user.getFullName(), user.getRole());
+        return new AuthResponse("Login successful", user.getId(), user.getUsername(), user.getFullName(), user.getRole());
+    }
+
+    @Transactional
+    public void resetPassword(hcmut.online_examination.dto.ForgotPasswordRequest request) {
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new hcmut.online_examination.exception.UserNotFoundException());
+
+        if (!user.getEmail().equalsIgnoreCase(request.email())) {
+            throw new InvalidCredentialsException("Email does not match our records for this username.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 }
