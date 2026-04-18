@@ -31,7 +31,7 @@ const TeacherDashboard = () => {
     fullName: "Prof. Nguyen Van An",
     role: "Senior Lecturer",
   };
-
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("user")) || {});
   const teacherNotifications = [
   {
     id: 1,
@@ -64,54 +64,75 @@ const TeacherDashboard = () => {
   ];
   const [notifications, setNotifications] = useState(teacherNotifications);
   useEffect(() => {
-    const fetchExams = async () => {
+    const fetchData = async () => {
+      if (!userData.id) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        // Giả sử API lấy danh sách bài thi của giáo viên
-        // Nếu chưa có API thật, block này sẽ rơi vào catch và dùng fake data
-        const response = await api.get("/api/exam/owner/" + currentUser.id);
-        setExams(response.data);
+        
+        // 1. Refresh User Info (Optional but good if user changed profile)
+        try {
+          const userRes = await api.get(`/api/users/${userData.id}`);
+          if (userRes.data) {
+            setUserData(userRes.data);
+            localStorage.setItem("user", JSON.stringify(userRes.data));
+          }
+        } catch (uErr) {
+          console.error("Failed to refresh user info:", uErr);
+        }
+
+        // 2. Fetch Exams
+        const examRes = await api.get(`/api/exam/owner/${userData.id}`);
+        
+        // Format the data to match frontend expectations
+        const formattedExams = examRes.data.map(exam => {
+          const now = new Date();
+          const start = new Date(exam.startTime);
+          const end = new Date(exam.endTime);
+          
+          let status = "Closed";
+          if (now >= start && now <= end) status = "Open";
+          else if (now < start) status = "Upcoming";
+
+          return {
+            ...exam,
+            status: status,
+            // Deriving some fields that might not be in the DTO yet
+            studentCount: exam.studentCount || "0/0", 
+            updatedAt: exam.updatedAt ? new Date(exam.updatedAt).toLocaleDateString() : "Just now",
+            startTime: start.toLocaleDateString(),
+            endTime: end.toLocaleDateString()
+          };
+        });
+
+        setExams(formattedExams);
       } catch (err) {
-        console.warn("Sử dụng dữ liệu giả cho Dashboard");
-        setExams([
-          {
-            id: 1,
-            name: "Midterm Exam I - Philology 12",
-            status: "Open",
-            durationInMinutes: 90,
-            startTime: "2024-10-10",
-            endTime: "2024-10-15",
-            studentCount: "42/45",
-            updatedAt: "2 hours ago",
-          },
-          {
-            id: 2,
-            name: "English Proficiency Survey (B2)",
-            status: "Closed",
-            durationInMinutes: 60,
-            startTime: "2024-10-12",
-            endTime: "2024-10-18",
-            studentCount: "128/130",
-            updatedAt: "1 day ago",
-          },
-          {
-            id: 3,
-            name: "Calculus Mathematics: Integral Applications",
-            status: "Open",
-            durationInMinutes: 120,
-            startTime: "2024-10-15",
-            endTime: "2024-10-20",
-            studentCount: "15/45",
-            updatedAt: "3 days ago",
-          },
-        ]);
+        console.warn("Failed to fetch exams, using fallback data if any", err);
+        // Fallback for demo purposes if API fails
+        if (exams.length === 0) {
+          setExams([
+            {
+              id: 1,
+              name: "Midterm Exam I - Philology 12",
+              status: "Open",
+              durationInMinutes: 90,
+              startTime: "2024-10-10",
+              endTime: "2024-10-15",
+              studentCount: "42/45",
+              updatedAt: "2 hours ago",
+            }
+          ]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchExams();
-  }, []);
+    fetchData();
+  }, [userData.id]);
 
 
 
@@ -147,10 +168,10 @@ const TeacherDashboard = () => {
           <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-[#aab3b8]/10 shadow-sm">
             <div className="text-right">
               <p className="text-xs font-bold text-[#2b3437]">
-                {currentUser.fullName || "Teacher"}
+                {userData.fullName || "Teacher"}
               </p>
               <p className="text-[10px] text-[#4c6367]">
-                {currentUser.role || "Lecturer"}
+                {userData.role || "Lecturer"}
               </p>
             </div>
             <UserCircle size={28} className="text-[#026880]" />

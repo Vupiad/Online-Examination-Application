@@ -50,13 +50,6 @@ const StudentLayout = () => {
             <FileText size={24} />
             <span className="text-[10px]">Take Test</span>
           </Link>
-          <Link
-            to="/settings"
-            className={`flex flex-col items-center gap-1 ${isActive("/settings") ? "text-[#026880] font-bold" : "text-[#2b3437] font-medium"}`}
-          >
-            <Settings size={24} />
-            <span className="text-[10px]">Settings</span>
-          </Link>
         </nav>
       </div>
     </div>

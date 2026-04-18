@@ -10,5 +10,6 @@ public record ExamDto(
         Instant endTime,   
         Instant startTime,       
         Long durationInMinutes,
+        Instant updatedAt,
         List<QuestionDto> questions
 ) {}
