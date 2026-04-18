@@ -16,12 +16,15 @@ import {
   Lightbulb,
 } from "lucide-react";
 import api from "../../services/api";
+import Notify from "./../../components/Notify"
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showNotify, setShowNotify] = useState(false);
+  
 
   // Lấy thông tin user từ localStorage
   const currentUser = JSON.parse(localStorage.getItem("user")) || {
@@ -29,6 +32,37 @@ const TeacherDashboard = () => {
     role: "Senior Lecturer",
   };
 
+  const teacherNotifications = [
+  {
+    id: 1,
+    title: "New submission: Midterm Exam I",
+    time: "5 minutes ago",
+    read: false,
+    type: "submission"
+  },
+  {
+    id: 2,
+    title: "Suspicious activity detected! Student: Hoang Nam",
+    time: "15 minutes ago",
+    read: false,
+    type: "warning"
+  },
+  {
+    id: 3,
+    title: "Class 12A1: 100% students completed the test",
+    time: "2 hours ago",
+    read: true,
+    type: "report"
+  },
+  {
+    id: 4,
+    title: "System maintenance: Sunday 02:00 AM",
+    time: "1 day ago",
+    read: true,
+    type: "system"
+  }
+  ];
+  const [notifications, setNotifications] = useState(teacherNotifications);
   useEffect(() => {
     const fetchExams = async () => {
       try {
@@ -79,6 +113,8 @@ const TeacherDashboard = () => {
     fetchExams();
   }, []);
 
+
+
   const filteredExams = exams.filter((exam) =>
     exam.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -96,9 +132,17 @@ const TeacherDashboard = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#e8eff2] hover:bg-[#e2e9ed] transition-colors text-[#2b3437]">
-            <Bell size={20} />
-          </button>
+          <button onClick={() => setShowNotify(!showNotify)} className="w-10 h-10 flex items-center justify-center rounded-full text-[#576065] hover:bg-[#dbe4e9] transition-colors">
+              <Bell size={20} />
+            </button>
+            {showNotify && (
+              <div  className="absolute right-0 top-12 z-50 translate-x-[-100px] translate-y-[36px]">
+                <Notify 
+  notifications={notifications} 
+  onMarkAllRead={() => setNotifications(notifications.map(n => ({...n, read: true})))} 
+/>
+              </div>
+            )}
           <div className="h-8 w-[1px] bg-[#aab3b8]/30 mx-2"></div>
           <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-[#aab3b8]/10 shadow-sm">
             <div className="text-right">

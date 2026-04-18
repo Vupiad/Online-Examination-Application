@@ -11,6 +11,7 @@ import ExamResults from "./pages/teacher/ExamResults";
 // Import Layout
 import StudentLayout from "./components/StudentLayout";
 import TeacherLayout from "./components/TeacherLayout";
+import Notify from "./components/Notify"
 import "./App.css";
 
 function App() {

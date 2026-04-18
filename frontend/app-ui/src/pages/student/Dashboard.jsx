@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
+import Notify from "./../../components/Notify"
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -18,11 +19,44 @@ const Dashboard = () => {
   });
   const [testHistory, setTestHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showNotify, setShowNotify] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user")) || {
     fullName: "Student",
     id: 1,
   };
+
+  const studentNotifications = [
+  {
+    id: 1,
+    title: "Your Calculus test results are available",
+    time: "10 minutes ago",
+    read: false,
+    type: "result"
+  },
+  {
+    id: 2,
+    title: "New exam assigned: Physics - Optics",
+    time: "1 hour ago",
+    read: false,
+    type: "new_test"
+  },
+  {
+    id: 3,
+    title: "Deadline approaching: English Simulation",
+    time: "3 hours ago",
+    read: true,
+    type: "deadline"
+  },
+  {
+    id: 4,
+    title: "Welcome to SmartTravel AI workshop",
+    time: "2 days ago",
+    read: true,
+    type: "invite"
+  }
+  ];
+  const [notifications, setNotifications] = useState(studentNotifications);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -53,7 +87,7 @@ const Dashboard = () => {
             code: "TH-G3-2024",
             date: "15/10/2023",
             duration: "45 mins",
-            status: "Submitted",
+            status: "Completed",
             score: 9.0,
           },
           {
@@ -80,7 +114,7 @@ const Dashboard = () => {
             code: "EN-IELTS-01",
             date: "28/09/2023",
             duration: "120 mins",
-            status: "Submitted",
+            status: "Completed",
             score: 8.0,
           },
         ]);
@@ -90,6 +124,7 @@ const Dashboard = () => {
     };
     fetchDashboardData();
   }, [currentUser.id]);
+
 
   return (
     <div className="min-h-screen bg-[#f7fafc]">
@@ -101,9 +136,17 @@ const Dashboard = () => {
           </h2>
 
           <div className="flex items-center gap-4">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full text-[#576065] hover:bg-[#dbe4e9] transition-colors">
+            <button onClick={() => setShowNotify(!showNotify)} className="w-10 h-10 flex items-center justify-center rounded-full text-[#576065] hover:bg-[#dbe4e9] transition-colors">
               <Bell size={20} />
             </button>
+            {showNotify && (
+              <div className="absolute right-0 top-12 z-50 translate-x-[-200px] translate-y-[8px]">
+                <Notify 
+                  notifications={notifications} 
+                  onMarkAllRead={() => setNotifications(notifications.map(n => ({...n, read: true})))} 
+                />
+              </div>
+              )}
             <Link
               to="/taketest"
               className="bg-[#026880] text-white px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[#005b70] active:scale-95 transition-all shadow-md shadow-[#026880]/10"
@@ -290,6 +333,8 @@ const Dashboard = () => {
           </div>
         </section>
       </div>
+
+      
     </div>
   );
 };

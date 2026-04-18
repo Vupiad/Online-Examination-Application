@@ -25,10 +25,10 @@ const StudentLayout = () => {
           <div className="text-xl font-bold text-[#026880] tracking-tight font-['Be_Vietnam_Pro']">
             The Serene Scholar
           </div>
-          <div className="flex gap-4">
+          <button className="flex gap-4">
             <Bell className="text-[#026880]" size={24} />
             <CircleHelp className="text-[#026880]" size={24} />
-          </div>
+          </button>
         </header>
 
         <main className="flex-1 pb-20 md:pb-0 relative overflow-hidden">
