@@ -45,4 +45,5 @@ public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
     @EntityGraph(attributePaths = { "questions", "questions.options" })
     @Query("SELECT e FROM ExamEntity e WHERE e.examCode = :examCode")
     Optional<ExamEntity> findFullExam(@Param("examCode") String examCode);
+    List<ExamEntity> findAllByOwnerOrderByStartTimeDesc(User owner);
 }

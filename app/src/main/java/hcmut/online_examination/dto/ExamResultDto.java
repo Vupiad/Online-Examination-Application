@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-public record ExamResultDto(
+public record ExamResultDto(   
         String examName,
         String examCode,
         UserDto examinee, 
+        Long durationInMinutes,
         Long timeTaken,       
         BigDecimal score,
         BigDecimal totalScore,
