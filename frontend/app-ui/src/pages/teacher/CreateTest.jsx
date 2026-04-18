@@ -127,6 +127,7 @@ const CreateTest = () => {
           : null,
         questions: questions.map((q) => ({
           content: q.content,
+          score: 1.0,
           options: q.options.map((opt) => ({
             content: opt.content,
             isCorrect: opt.isCorrect,

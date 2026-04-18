@@ -28,7 +28,17 @@ const Login = () => {
     try {
       const response = await authService.login({ username, password });
       console.log("Login success:", response);
-      navigate("/");
+
+      const user =
+        response?.user ||
+        response?.data?.user ||
+        JSON.parse(localStorage.getItem("user"));
+
+      if (user && user.role === "TEACHER") {
+        navigate("/teacher/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err?.message || "Login failed. Please check your credentials.");
       console.error("Login error:", err);

@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import LandingPage from "./pages/landingpage/landingpage";
+import StudentDashboard from "./pages/student/Dashboard";
 import TakeTest from "./pages/student/TakeTest";
 import TestInterface from "./pages/student/TestInterface";
+import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateTest from "./pages/teacher/CreateTest";
 import ExamResults from "./pages/teacher/ExamResults";
 // Import Layout
@@ -25,7 +27,7 @@ function App() {
         <Route element={<StudentLayout />}>
           <Route
             path="/dashboard"
-            element={<div className="p-8">Đây là trang Dashboard</div>}
+            element={<StudentDashboard />}
           />
           <Route path="/taketest" element={<TakeTest />} />
           <Route
@@ -36,7 +38,7 @@ function App() {
         <Route element={<TeacherLayout />}>
           <Route
             path="/teacher/dashboard"
-            element={<div className="p-8">Đây là trang Teacher Dashboard</div>}
+            element={<TeacherDashboard />}
           />
           <Route path="/teacher/create-test" element={<CreateTest />} />
           <Route
